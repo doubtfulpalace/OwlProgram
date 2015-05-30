@@ -1,4 +1,4 @@
-// #define DEBUG_DWT /* now done by firmware */
+#define DEBUG_DWT /* now done by firmware */
 #define DEBUG_MEM
 // #define STARTUP_CODE
 
@@ -12,7 +12,6 @@
 #else
 extern "C" void* _sbrk(int incr);
 #endif /* DEBUG_MEM */
-
 extern void setup();
 extern void processBlock();
 
@@ -24,7 +23,10 @@ extern char _ebss[];
 
 extern "C" void __libc_init_array();
 
-
+// extern "C" {
+//   SharedMemory ProgramVector;
+// }
+int doneFft=0;
 #define BANK1_SRAM3 0x68000000
 int main(void){
 #ifdef STARTUP_CODE
@@ -55,6 +57,7 @@ int main(void){
     // problem!
     // getSharedMemory()->status = AUDIO_ERROR_STATUS;
     getSharedMemory()->error = CHECKSUM_ERROR_STATUS;
+    getSharedMemory()->message = "ProgramVector checksum error";
     getSharedMemory()->programStatus(AUDIO_ERROR_STATUS);
     // getSharedMemory()->exitProgram();
     // return -1;
@@ -80,7 +83,27 @@ int main(void){
       *DWT_CYCCNT = 0; // reset the counter
       // DWT->CYCCNT = 0; // reset the counter
 #endif /* DEBUG_DWT */
+    doneFft=0;
       processBlock();
+    static int dasCount=0;
+    dasCount++;
+    static int maxCount=0;
+    static int minCount=888888888;
+    static int wasfft=0;
+    if(maxCount<*DWT_CYCCNT/128){
+      maxCount=*DWT_CYCCNT/128;
+      wasfft=doneFft;
+    }
+    if(minCount>*DWT_CYCCNT/128){
+      minCount=*DWT_CYCCNT/128;
+      wasfft=doneFft;
+    }
+    if((dasCount&127)==0){
+      debugMessage("minCount, maxCount", minCount, maxCount);
+      maxCount=0;
+      minCount=88888888;
+      wasfft=-1;
+    }
 #ifdef DEBUG_DWT
       getSharedMemory()->cycles_per_block = *DWT_CYCCNT;
       // dwt_count = DWT->CYCCNT;
