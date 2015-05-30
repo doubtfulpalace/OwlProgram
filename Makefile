@@ -50,7 +50,7 @@ MULTI_SRC = PatchController.cpp PatchRegistry.cpp MultiProgram.cpp
 
 OBJS =  $(C_SRC:%.c=Build/%.o) $(CPP_SRC:%.cpp=Build/%.o)
 
-OBJS += Libraries/OwlPatches/retuner.o
+# OBJS += Libraries/OwlPatches/retuner.o
 # OBJS += Libraries/OwlPatches/Retune/zita-resampler/resampler.o
 # OBJS += Libraries/OwlPatches/Retune/zita-resampler/resampler-table.o
 
