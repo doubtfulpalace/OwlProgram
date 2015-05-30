@@ -13,35 +13,46 @@ ifeq ($(CONFIG),Release)
 CFLAGS   = -O2
 endif
 
-CFLAGS  += -DEXTERNAL_SRAM
-CFLAGS  += -nostdlib -nostartfiles -ffreestanding
-CFLAGS  += -mtune=cortex-m4
-CFLAGS  += -fpic -fpie
-CFLAGS  += -fno-builtin
-# CFLAGS  += -fpic
-# CFLAGS  += -mpic-data-is-text-relative
+CFLAGS += -DEXTERNAL_SRAM
+CFLAGS += -nostdlib -nostartfiles -ffreestanding
+CFLAGS += -mtune=cortex-m4
+CFLAGS += -fpic
+CFLAGS += -fpie
+CFLAGS += -fno-builtin
 CFLAGS += -fdata-sections 
-# CFLAGS += -ffunction-sections
+CFLAGS += -ffunction-sections
+# CFLAGS +=  -munaligned-access
+CFLAGS +=  -mno-unaligned-access
+# CFLAGS += –mlong-calls
+
+# CFLAGS += -mpic-data-is-text-relative
 # CFLAGS += -fno-omit-frame-pointer
-# CFLAGS  += -flto
+CFLAGS += -flto
+
 CXXFLAGS = -fno-rtti -fno-exceptions -std=c++11 $(CFLAGS) 
 
-LDFLAGS = -fpic -fpie
-# LDFLAGS = -fpic
-# LDFLAGS = -flto
 LDFLAGS = -Wl,--gc-sections
-# ASFLAGS  = -g
+LDFLAGS = -fpic
+LDFLAGS = -fpie
+LDFLAGS = -flto
+
 LDLIBS   = -lm
 LDSCRIPT = Source/flash.ld
-FIRMWARESENDER = Tools/FirmwareSender
+FIRMWARESENDER = Tools/FirmwareSender -s 240
+
+LDLIBS   = -lm
 
 C_SRC   = errorhandlers.c gpio.c eepromcontrol.c basicmaths.c # myalloc.c
-CPP_SRC = main.cpp operators.cpp
+CPP_SRC = main.cpp operators.cpp message.cpp
 OWL_SRC = StompBox.cpp PatchProcessor.cpp
 SOLO_SRC = SoloProgram.cpp
 MULTI_SRC = PatchController.cpp PatchRegistry.cpp MultiProgram.cpp
 
 OBJS =  $(C_SRC:%.c=Build/%.o) $(CPP_SRC:%.cpp=Build/%.o)
+
+OBJS += Libraries/OwlPatches/retuner.o
+# OBJS += Libraries/OwlPatches/Retune/zita-resampler/resampler.o
+# OBJS += Libraries/OwlPatches/Retune/zita-resampler/resampler-table.o
 
 SOLO_OBJS = $(OWL_SRC:%.cpp=Build/%.o) $(SOLO_SRC:%.cpp=Build/%.o)
 MULTI_OBJS = $(OWL_SRC:%.cpp=Build/%.o) $(MULTI_SRC:%.cpp=Build/%.o)
@@ -57,6 +68,7 @@ OBJS += $(SYSCALLS)
 OBJS += # $(BUILD)/stm32f4xx_gpio.o $(BUILD)/stm32f4xx_rcc.o
 OBJS += $(DSPLIB)/FastMathFunctions/arm_sin_f32.o
 OBJS += $(DSPLIB)/FastMathFunctions/arm_cos_f32.o
+
 OBJS += Libraries/kiss_fft130/kiss_fft.o
 
 OBJS += $(DSPLIB)/TransformFunctions/arm_cfft_f32.o
@@ -66,6 +78,9 @@ OBJS += $(DSPLIB)/TransformFunctions/arm_rfft_fast_f32.o
 OBJS += $(DSPLIB)/TransformFunctions/arm_rfft_fast_init_f32.o
 OBJS += $(DSPLIB)/CommonTables/arm_common_tables.o
 OBJS += $(DSPLIB)/CommonTables/arm_const_structs.o
+
+OBJS += $(DSPLIB)/FilteringFunctions/arm_biquad_cascade_df1_init_f32.o
+OBJS += $(DSPLIB)/FilteringFunctions/arm_biquad_cascade_df1_f32.o
 
 # OBJS += $(DSPLIB)/SupportFunctions/arm_float_to_q31.o
 # OBJS += $(DSPLIB)/SupportFunctions/arm_q31_to_float.o
