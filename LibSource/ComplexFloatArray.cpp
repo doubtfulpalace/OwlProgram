@@ -1,4 +1,5 @@
 #include "ComplexFloatArray.h"
+#include "message.h" //needed for ASSERT
 #include "basicmaths.h"
 
 float ComplexFloatArray::mag(const int i){

@@ -1,5 +1,6 @@
 #include "FloatArray.h"
 #include "basicmaths.h"
+#include "message.h" //needed for ASSERT
 #include <string.h>
 
 void FloatArray::getMin(float* value, int* index){

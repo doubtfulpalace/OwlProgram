@@ -11,6 +11,7 @@
 #include "Resample.h"
 #include "PitchDetector.hpp"
 #include "FirFilter.hpp"
+#include "BlepVco.h"
 #include "patch.h"
 #include "main.h"
 

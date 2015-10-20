@@ -1,11 +1,8 @@
 #ifndef __FirFilter_h__
 #define __FirFilter_h__
 
-#ifndef ARM_CORTEX
-#define ARM_CORTEX
-#endif
-
 #include "FloatArray.h"
+#include "message.h"
 
 class FirFilter {
 private:
@@ -15,14 +12,14 @@ private:
 #ifdef ARM_CORTEX
   arm_fir_instance_f32 instance;
 #else
-  TODO
+  // TODO
 #endif /* ARM_CORTEX */
 
   void processBlock(float* source, float* destination, int size){
 #ifdef ARM_CORTEX
-    arm_fir_f32(&instance, source, destination, size);
+  arm_fir_f32(&instance, source, destination, size);
 #else
-    ASSERT(0, "TODO");
+  // TODO
 #endif /* ARM_CORTEX */
   }
   

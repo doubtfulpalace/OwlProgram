@@ -75,9 +75,9 @@ LDLIBS   ?= -lm
 LDSCRIPT ?= Source/flash.ld
 FIRMWARESENDER = Tools/FirmwareSender
 
-C_SRC   = basicmaths.c
+C_SRC   = basicmaths.c minblep_table.c
 CPP_SRC = main.cpp operators.cpp message.cpp StompBox.cpp PatchProcessor.cpp
-CPP_SRC += FloatArray.cpp ComplexFloatArray.cpp
+CPP_SRC += FloatArray.cpp ComplexFloatArray.cpp BlepVco.cpp
 CPP_SRC += PatchProgram.cpp
 
 SOURCE       = $(BUILDROOT)/Source
