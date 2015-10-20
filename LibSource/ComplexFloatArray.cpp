@@ -1,6 +1,5 @@
 #include "ComplexFloatArray.h"
 #include "basicmaths.h"
-#include "message.h"
 
 float ComplexFloatArray::mag(const int i){
   float result;
