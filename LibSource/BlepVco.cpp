@@ -191,7 +191,7 @@ void VCO_blepsaw::getSamples (FloatArray outputBuffer)
   int    j, n;
   float  *outp, *freq, *expm, *linm, *syncin, *syncout;
   float  a, p, t, w, dw, z;
-  outp = (float*)outputBuffer;
+  outp = outputBuffer.getData();
   syncout = syncOutBuffer;
   syncin = syncInBuffer;
   freq = frequencyBuffer - 1;
@@ -214,10 +214,8 @@ void VCO_blepsaw::getSamples (FloatArray outputBuffer)
      *   place_slope_dd(_f, j, 0.0f, w, -1.0f); */
     _init = 0;
   }
-  a = 0.2 + 0.8 * _port [FILT][0];
-  int count = 0;
-  static int invocations = 0;
-  invocations ++;
+  // _port is not initialised  a = 0.2 + 0.8 * _port [FILT][0];
+  a = 0.5f; // when a = 1, LPfilter is disabled
   do
   {
     n = (len > 24) ? 16 : len;
@@ -266,10 +264,6 @@ void VCO_blepsaw::getSamples (FloatArray outputBuffer)
       _f[j + DD_SAMPLE_DELAY] += 0.5f - p;
 
       z += a * (_f[j] - z);
-      count++;
-      if (count == 2){
-        return;
-      }
       *outp++ = z;
       syncin++;
       syncout++;
