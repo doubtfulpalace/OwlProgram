@@ -122,6 +122,7 @@ EMCC_SRC  += $(LIBSOURCE)/basicmaths.c $(LIBSOURCE)/StompBox.cpp $(LIBSOURCE)/Fl
 EMCC_SRC  += $(PATCH_CPP_SRC) $(PATCH_C_SRC)
 EMCC_SRC  += Libraries/KissFFT/kiss_fft.c
 EMCC_SRC  += $(wildcard $(HEAVYDIR)/*.c)
+EMCC_SRC  += $(LIBSOURCE)/BlepVco.cpp $(LIBSOURCE)/minblep_table.c
 WEBDIR     = $(BUILD)/web
 
 # JavaScript minifiers
