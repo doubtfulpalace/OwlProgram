@@ -49,25 +49,20 @@ public:
     FloatArray::destroy(envBuffer);
   }
   void processAudio(AudioBuffer &buffer){
-    //  env.setAttack(getParameterValue(PARAMETER_A)*4);
-    //  env.setDecay(getParameterValue(PARAMETER_B)*4);
-    //  env.setSustain(getParameterValue(PARAMETER_C));
-    //  env.setRelease(getParameterValue(PARAMETER_D)*4);
-    env.setAttack(1);
-    env.setDecay(1);
-    env.setSustain(.5);
-    env.setRelease(1);
+    env.setAttack(getParameterValue(PARAMETER_A)*4);
+    env.setDecay(getParameterValue(PARAMETER_B)*4);
+    env.setSustain(getParameterValue(PARAMETER_C));
+    env.setRelease(getParameterValue(PARAMETER_D)*4);
 
     FloatArray fa=buffer.getSamples(0);
     fa.noise();
-    env.gate(isButtonPressed(PUSHBUTTON));
+    bool gate = isButtonPressed(RED_BUTTON);
+    env.gate(gate);
     env.getSamples(envBuffer);
     fa.multiply(envBuffer);
     fa.multiply(0.2);
+    debugMessage("gate: ", (int)gate);
     static float maxValue = 0;
-    float m = envBuffer.getMaxValue();
-    maxValue = maxValue > m ? maxValue : m;
-    //  debugMessage("max value", maxValue );
   }
 };
 
