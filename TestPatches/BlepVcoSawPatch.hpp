@@ -33,6 +33,7 @@ public:
     saw.setTune(0);
     saw.active(true);
   }
+
   void processAudio(AudioBuffer &buffer){
     float tune = getParameterValue(PARAMETER_A)*6.0 - 3.0;
     float detune = getParameterValue(PARAMETER_B);
@@ -41,11 +42,12 @@ public:
     gain = gain*gain*1.2;
     gain *= 0.2+mix*0.8;
     FloatArray left = buffer.getSamples(LEFT_CHANNEL);
-    //  saw.setMix(mix);
-    //  saw.setDetune(detune);
+    // saw.setMix(mix);
+    // saw.setDetune(detune);
     float volts = sample2volts(left[0]);
     float frequency = volts2hz(volts+tune);
-    //  saw.setFrequency(frequency);
+    // saw.setFrequency(frequency);
+    saw.setTune(tune);
     saw.getSamples(left);
   }
 };
