@@ -1,12 +1,10 @@
 #ifndef __FirFilter_h__
 #define __FirFilter_h__
 
-#ifndef ARM_CORTEX
-#define ARM_CORTEX
-#endif
-
 #include "FloatArray.h"
-
+#ifdef ARM_CORTEX
+#undef ARM_CORTEX
+#endif
 class FirFilter {
 private:
   FloatArray coefficients;
@@ -15,14 +13,23 @@ private:
 #ifdef ARM_CORTEX
   arm_fir_instance_f32 instance;
 #else
-  TODO
+  
 #endif /* ARM_CORTEX */
 
   void processBlock(float* source, float* destination, int size){
 #ifdef ARM_CORTEX
-    arm_fir_f32(&instance, source, destination, size);
+  arm_fir_f32(&instance, source, destination, size);
 #else
-    ASSERT(0, "TODO");
+  //naive implemementation
+  float* y = destination;
+  float* x = source;
+  float* b = coefficients;
+  for(int n = 0; n < size; n++){
+    y[n] = 0;
+    for (int i = 0; i < coefficients.getSize(); i++){
+      y[n] += b[i] * x[n-i];
+    }
+  }
 #endif /* ARM_CORTEX */
   }
   
