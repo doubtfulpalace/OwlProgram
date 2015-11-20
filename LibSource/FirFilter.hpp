@@ -20,6 +20,7 @@ private:
   arm_fir_f32(&instance, source, destination, size);
 #else
   // TODO
+    ASSERT(false, "TODO");
 #endif /* ARM_CORTEX */
   }
   

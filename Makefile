@@ -75,9 +75,9 @@ LDLIBS   ?= -lm
 LDSCRIPT ?= Source/flash.ld
 FIRMWARESENDER = Tools/FirmwareSender
 
-C_SRC   = basicmaths.c minblep_table.c
+C_SRC   = basicmaths.c
 CPP_SRC = main.cpp operators.cpp message.cpp StompBox.cpp PatchProcessor.cpp
-CPP_SRC += FloatArray.cpp ComplexFloatArray.cpp BlepVco.cpp
+CPP_SRC += FloatArray.cpp ComplexFloatArray.cpp
 CPP_SRC += PatchProgram.cpp
 
 SOURCE       = $(BUILDROOT)/Source
@@ -113,8 +113,8 @@ EMCCFLAGS += -IOwlPatches -I$(SOURCE) -I$(PATCHSOURCE) -I$(LIBSOURCE) -I$(BUILD)
 EMCCFLAGS += -I$(BUILD)/HeavySource
 EMCCFLAGS += -ILibraries/KissFFT
 EMCCFLAGS += -Wno-warn-absolute-paths
-EMCCFLAGS += -Wno-c++11-extensions
 EMCCFLAGS += -Wno-unknown-warning-option
+EMCCFLAGS += -Wno-c++11-extensions
 EMCCFLAGS += -s EXPORTED_FUNCTIONS="['_WEB_setup','_WEB_setParameter','_WEB_processBlock','_WEB_getPatchName','_WEB_getParameterName','_WEB_getMessage','_WEB_getStatus']"
 EMCC_SRC   = $(SOURCE)/PatchProgram.cpp $(SOURCE)/PatchProcessor.cpp $(SOURCE)/operators.cpp $(SOURCE)/message.cpp
 EMCC_SRC  += WebSource/web.cpp
@@ -122,7 +122,6 @@ EMCC_SRC  += $(LIBSOURCE)/basicmaths.c $(LIBSOURCE)/StompBox.cpp $(LIBSOURCE)/Fl
 EMCC_SRC  += $(PATCH_CPP_SRC) $(PATCH_C_SRC)
 EMCC_SRC  += Libraries/KissFFT/kiss_fft.c
 EMCC_SRC  += $(wildcard $(HEAVYDIR)/*.c)
-EMCC_SRC  += $(LIBSOURCE)/BlepVco.cpp $(LIBSOURCE)/minblep_table.c
 WEBDIR     = $(BUILD)/web
 
 # JavaScript minifiers
