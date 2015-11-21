@@ -28,3 +28,7 @@
 *.app
 
 Source/progname.s
+
+*.wav
+*.bin
+*.m
