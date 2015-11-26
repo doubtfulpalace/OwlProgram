@@ -41,8 +41,8 @@ USAGE: if you already have a file minblep_table.c you are probably
   happy, otherwise:
   - you need to have fftw installed.
   - compile, run and clean binary with 
-    $ gcc --std=c99 minblep.c -lfftw -lm -o minblep && ./minblep && rm minblep
-    this will generate a file minblep_minblep_table.c
+    $ gcc --std=c99 generate_BlepVco_table.c -lfftw -lm -o generate_BlepVco_table && ./generate_BlepVco_table && rm generate_BlepVco_table
+    this will generate a file minblep_table.c
     
   This assumes you have a valid minblep_table.h file with the following content::
 
@@ -440,7 +440,7 @@ main(void)
     printf("SUCCESS: Succesfully written to file!\n");
     free(blep);
     free(shiftblep);
-    return 0;
+    //  return 0;
     // Daniel Werner's program continued with the below lines, while 
     // we exit earlier and will do those operations inside the BlepVco
     // class constructor.
