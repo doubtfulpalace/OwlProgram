@@ -44,6 +44,7 @@ public:
     registerParameter(PARAMETER_C, "Sustain");
     registerParameter(PARAMETER_D, "Release");
     envBuffer = FloatArray::create(getBlockSize());
+    debugMessage("__");
   }
   ~EnvelopeTestPatch(){
     FloatArray::destroy(envBuffer);
@@ -56,12 +57,29 @@ public:
 
     FloatArray fa=buffer.getSamples(0);
     fa.noise();
-    bool gate = isButtonPressed(RED_BUTTON);
-    env.gate(gate);
+    static int lastButton = GREEN_BUTTON; //to avoid automatic triggering on startup
+    int button;
+    if(isButtonPressed(GREEN_BUTTON))
+      button = GREEN_BUTTON;
+    else 
+      button = RED_BUTTON;
+    
+    // use next two lines to test gate. Gate will be on as long as the red light is on
+    //  bool gate = (button == RED_BUTTON);
+    //  env.gate(gate);
+    
+    // use next 6 lines to test trigger
+    bool trigger = (lastButton != button);
+    static int count = 0;
+    if(trigger){
+      env.trigger();
+    }
+    lastButton = button;
+    
     env.getEnvelope(envBuffer);
     fa.multiply(envBuffer);
     fa.multiply(0.2);
-    debugMessage("gate: ", (int)gate);
+    
     static float maxValue = 0;
   }
 };

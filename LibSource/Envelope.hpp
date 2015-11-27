@@ -36,10 +36,12 @@ public:
   void attenuate(FloatArray &buf); // increments envelope by buffer length
 private:
   void updateStage(){
-    if(gateState)
+    debugMessage("start");
+    if(gateState == true)
       stage = kAttack;
-    else if(trig == kGate)
+    else if(trig == kGate){ //the gate has just been switched off
       stage = kRelease;
+    }
   }
   static constexpr float minTime = 0.005;
   const float samplePeriod;
@@ -114,8 +116,9 @@ void AdsrEnvelope::gate(bool state, int delay){
   if(gateState != state){
     gateTime = delay;
     gateState = state;
-    if(gateTime == 0)
+    if(gateTime == 0){
       updateStage();
+    }
   }
   trig = kGate;
 }
@@ -135,21 +138,29 @@ void AdsrEnvelope::getEnvelope(FloatArray &output){
 }
 
 float AdsrEnvelope::getNextSample(){
-  if(gateTime && --gateTime == 0)
+  if(gateTime && --gateTime == 0){
     updateStage();
+  }
   switch (stage) {
   case kAttack:
+    debugMessage("attack");
     // attack ramp
     level += attackIncrement;
     if(level >= 1.0){
       level = 1.0;
-      stage = kDecay;
+      if(trig == kGate)
+        stage = kDecay;
+      else { //if, instead, it is a trigger
+        stage = kRelease;
+        gateState = false;
+      }
     }else if(gateState == false && trig == kGate){
       stage = kRelease;
     }
     break;
   case kDecay:
     // decay ramp
+    ASSERT(trig != kTrigger, "Decay stage during trigger"); //we should never be here if the ADSR was started with a trigger
     level += decayIncrement;
     if(level <= sustain){
       level = sustain;
@@ -159,11 +170,13 @@ float AdsrEnvelope::getNextSample(){
     }
     break;
   case kSustain:
+    ASSERT(trig != kTrigger, "Sustain stage during trigger"); //we should never be here if the ADSR was started with a trigger
     level = sustain;
     if(gateState == false)
       stage = kRelease;
     break;
   case kRelease:
+    debugMessage("release");
     // release ramp
     level += releaseIncrement;
     if(level <= 0.0){
@@ -174,6 +187,7 @@ float AdsrEnvelope::getNextSample(){
     }
     break;
   case kIdle:
+    debugMessage("idle");
     level = 0;
     if(gateState == true || trig == kRetrigger)
       stage = kAttack;
