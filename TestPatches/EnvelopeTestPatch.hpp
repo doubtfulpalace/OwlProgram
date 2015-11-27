@@ -58,7 +58,7 @@ public:
     fa.noise();
     bool gate = isButtonPressed(RED_BUTTON);
     env.gate(gate);
-    env.getSamples(envBuffer);
+    env.getEnvelope(envBuffer);
     fa.multiply(envBuffer);
     fa.multiply(0.2);
     debugMessage("gate: ", (int)gate);
