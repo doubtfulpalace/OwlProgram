@@ -8,6 +8,47 @@
 
 AudioBuffer::~AudioBuffer(){}
 
+template<>
+PatchParameter<float>::PatchParameter(PatchParameterId id, const char* name, float min, float max)
+  :pid(id), minValue(min), maxValue(max) {
+  getProgramVector()->registerPatchParameter(pid, name);
+}
+
+template<>
+PatchParameter<int>::PatchParameter(PatchParameterId id, const char* name, int min, int max)
+  :pid(id), minValue(min), maxValue(max) {
+  getProgramVector()->registerPatchParameter(pid, name);
+}
+
+// float PatchProcessor::getParameterValue(PatchParameterId pid){
+//   if(pid < NOF_ADC_VALUES)
+//     return parameterValues[pid]/4096.0f;
+//   else
+//     return 0.0f;
+// }
+
+// PatchParameter& PatchParameter::setRange(float mn, float mx){
+//   min = mn;
+//   max = mx;
+//   return *this;
+// }
+
+template<>
+float PatchParameter<float>::getValue(){
+  uint16_t value = 0;
+  if(pid < getProgramVector()->parameters_size)
+    value = getProgramVector()->parameters[pid];
+  return (value/4096.0f)*(maxValue - minValue) + minValue;
+}
+
+template<>
+int PatchParameter<int>::getValue(){
+  uint16_t value = 0;
+  if(pid < getProgramVector()->parameters_size)
+    value = getProgramVector()->parameters[pid];
+  return value*(maxValue - minValue)/4096 + minValue;
+}
+
 PatchProcessor* getInitialisingPatchProcessor();
 
 Patch::Patch() : processor(getInitialisingPatchProcessor()){
@@ -15,7 +56,7 @@ Patch::Patch() : processor(getInitialisingPatchProcessor()){
 
 Patch::~Patch(){}
 
-void Patch::registerParameter(PatchParameterId pid, const char* name, const char* description){
+void Patch::registerParameter(PatchParameterId pid, const char* name){
   if(getProgramVector()->registerPatchParameter != NULL)
     getProgramVector()->registerPatchParameter(pid, name);
 }
@@ -30,9 +71,6 @@ int Patch::getBlockSize(){
 
 float Patch::getParameterValue(PatchParameterId pid){
   return processor->getParameterValue(pid);
-  // if(pid < getProgramVector()->parameters_size)
-  //   return getProgramVector()->parameters[pid]/4096.0f;
-  // return 0.0;
 }
 
 AudioBuffer* Patch::createMemoryBuffer(int channels, int samples){

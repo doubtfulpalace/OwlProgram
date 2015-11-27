@@ -2,6 +2,7 @@
 #define __StompBox_h__
 
 #include "FloatArray.h"
+#include "basicmaths.h"
 class PatchProcessor;
 
 enum PatchParameterId {
@@ -35,11 +36,25 @@ public:
   static AudioBuffer* create(int channels, int samples);
 };
 
+template<typename T=float>
+class PatchParameter {
+private:
+  PatchParameterId pid;
+  T minValue;
+  T maxValue;
+public:
+  PatchParameter(PatchParameterId pid, const char* name, T min, T max);
+  T getValue();
+  operator T(){
+    return getValue();
+  }
+};
+
 class Patch {
 public:
   Patch();
   virtual ~Patch();
-  void registerParameter(PatchParameterId pid, const char* name, const char* description = "");
+  void registerParameter(PatchParameterId pid, const char* name);
   float getParameterValue(PatchParameterId pid);
   bool isButtonPressed(PatchButtonId bid);
   int getSamplesSinceButtonPressed(PatchButtonId bid);
