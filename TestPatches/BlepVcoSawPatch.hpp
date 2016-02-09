@@ -2,7 +2,7 @@
 #define __BlepVcoSawPatch_hpp__
 
 #include "StompBox.h"
-#include "minblep_table.c"
+#include "minblep_tables.c"
 #include "blepvco.c"
 class BlepVcoSawPatch : public Patch {
   //  VCO_blepsaw saw;
@@ -39,7 +39,7 @@ public:
   }
 
   void processAudio(AudioBuffer &buffer){
-    float tune = getParameterValue(PARAMETER_A)*440;
+    float tune = getParameterValue(PARAMETER_A)*20000;
     float detune = getParameterValue(PARAMETER_B);
     float mix = getParameterValue(PARAMETER_C);
     float gain = getParameterValue(PARAMETER_D);
@@ -59,7 +59,7 @@ public:
     for(int n = 0; n < buffer.getSize(); n++){
       left[n] = VCO_blepsaw_SampleCompute(&vco) * gain;
     }
-    //  debugMessage("me",left[0],left[1],left[2]);
+    debugMessage("frequency", tune);
   }
 };
 

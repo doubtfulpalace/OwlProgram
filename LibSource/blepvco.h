@@ -35,15 +35,15 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include "minblep_table.h"
+#include "minblep_tables.h"
 //----------------------------------------------------------------------------------------------------------
-#define SAMPLERATE              48000
+#define SAMPLERATE          44100
 #define _CCM_					__attribute__((section(".ccmram"))) // for use of CCM RAM (64kB)
 
 enum { FILLEN = 256 };
 
 //----------------------------------------------------------------------------------------------------------
-typedef struct { float value, delta; } float_value_delta;
+//  typedef struct { float value, delta; } float_value_delta;
 
 void place_step_dd(float *buffer, int index, float phase, float w, float scale);
 void place_slope_dd(float *buffer, int index, float phase, float w, float slope_delta);

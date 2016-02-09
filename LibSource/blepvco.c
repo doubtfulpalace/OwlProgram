@@ -37,15 +37,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "minblep_table.h"
+#include "minblep_tables.h"
 #include "blepvco.h"
 /**======================================================================================================**/
 
 VCO_blepsaw_t	mbSawOsc _CCM_;
 
 /**======================================================================================================**/
-float_value_delta* step_dd_table;
-float* slope_dd_table;
+//  float_value_delta* step_dd_table;
+//  float* slope_dd_table;
 
 
 void place_step_dd(float *buffer, int index, float phase, float w, float scale)
@@ -93,98 +93,6 @@ void place_slope_dd(float *buffer, int index, float phase, float w, float slope_
 //----------------------------------------------------------------------------------------------------------
 
 /* ==== hard-sync-capable sawtooth oscillator ==== */
-void VCO_blepsaw_Init(VCO_blepsaw_t *vco)
-{
-	
-  if(vco->_init == true)
-    return;
-  vco->_init = false;
-	vco->amp = 1.0f;
-	vco->freq = 440.f;
-	vco->syncin = 0.0f;
-	vco->_z = 0.0f;
-	vco->_j = 0;
-	memset (vco->_f, 0, (FILLEN + STEP_DD_PULSE_LENGTH) * sizeof (float));
-  
-  step_dd_table = (float_value_delta*)malloc(sizeof(float_value_delta)*(MINBLEP_PHASES * STEP_DD_PULSE_LENGTH + 1));
-  slope_dd_table = (float*)malloc(sizeof(float)*(MINBLEP_PHASES * SLOPE_DD_PULSE_LENGTH + 1));
-  
-  //generate the blep discontinuity and slope discontinuity delta tables
-  double t1, t2, a, d;
-  double *shiftblep = minblep_table;
-  /* Generate the step discontinuity delta table, which is the minBLEP minus the
-   * 'ideal' unit step.  Note that since the step delta is discontinuous,
-   * the common interpolation form:
-   *
-   *     value = sample[index] + fraction * (sample[index + 1] - sample[index])
-   *
-   * would fail at the discontinuity.  So instead, we store the table as
-   * pairs are numbers, the first being the delta's value at a particular
-   * index 'n', and the second being the difference between that value and
-   * the limit of the delta's value as the index approaches n + 1.
-   */
-  for (int i = 0; i < period * oversampling; i++) {
-  
-    /* Alas, more empirically derived constants....  The full minBLEP is
-     * period * oversampling (2048000) oversamples long, but we only need
-     * the first part of it approximately as long as the window width
-     * (4553) (approximate because the minimum-phase reconstruction smears
-     * the window a bit.)  I examined the full step delta and found a zero
-     * crossing at the 4606th oversample, beyond which the delta stays
-     * below -150dB, and truncated the pulse there, which, padded with zeros,
-     * yields a 72-sample pulse. */
-    if (i <= 4605) {
-      t1 = shiftblep[i];
-      t2 = shiftblep[i + 1];
-      if (i == 4605) t2 = 1.0;
-      if (i >= 4 * oversampling) {  /* subtract the ideal step */
-        t1 -= 1.0;
-        t2 -= 1.0;
-      }
-      step_dd_table[i].value = t1;
-      step_dd_table[i].delta = t2 - t1;
-    } else if (i < 72 * 64) {
-      /* pad remainder of last sample with zeros */
-      step_dd_table[i].value = 0;
-      step_dd_table[i].delta = 0;
-    } else if (i == 72 * 64) {
-      step_dd_table[i].value = 0;
-      step_dd_table[i].delta = 0;
-      /* guard point */
-      break;
-    }
-  }
-  /* Dump the slope discontinuity delta table, which is the integral of the
-   * minBLEP minus the 'ideal' unit slope change.  While its slope, or first
-   * differential, is discontinuous, the delta itself is continuous, so we
-   * can just store the table as single values.
-   */
-  a = 0.0;
-  for (int i = 0; i < period * oversampling; i++) {
-    /* More emperically derived constants  (local minimum at 4513th
-     * oversample, yielding a 71-sample pulse).... */
-    if (i <= 4512) {
-
-      a += shiftblep[i] / (double)oversampling;
-      if (i < 4 * oversampling) {
-          d = a;
-      } else {
-          d = a - (double)(i - 4 * oversampling) / (double)oversampling;   /* subtract ideal unit slope */
-      }
-      slope_dd_table[i] = d;
-
-    } else if (i < 71 * 64) {
-      /* pad remainder of last sample with zeros */
-      slope_dd_table[i] = 0;
-    } else if (i == 71 * 64) {
-      slope_dd_table[i] = 0; /* guard point */
-      break;
-    }
-  }
-  vco->_init = true;
-  
-}
-
 //----------------------------------------------------------------------------------------------------------
 
 float VCO_blepsaw_SampleCompute(VCO_blepsaw_t *vco)
@@ -268,3 +176,14 @@ float VCO_blepsaw_SampleCompute(VCO_blepsaw_t *vco)
 	return vco->out;
 }
 
+
+void VCO_blepsaw_Init(VCO_blepsaw_t *vco)
+{
+	vco->_init = true;
+	vco->amp = 1.0f;
+	vco->freq = 440.f;
+	vco->syncin = 0.0f;
+	vco->_z = 0.0f;
+	vco->_j = 0;
+	memset (vco->_f, 0, (FILLEN + STEP_DD_PULSE_LENGTH) * sizeof (float));
+}
