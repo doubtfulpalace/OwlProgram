@@ -30,20 +30,22 @@
  * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307, USA.
  */
+
 #ifndef _BLEPVCO_H
 #define _BLEPVCO_H
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include "minblep_tables.h"
+//> #include "CONSTANTS.h"
+#define SAMPLERATE              44100 //<
+
+#define _CCM_					__attribute__((section(".ccmram"))) // for use of CCM RAM (64kB) //<
+
 //----------------------------------------------------------------------------------------------------------
-#define SAMPLERATE          44100
-#define _CCM_					__attribute__((section(".ccmram"))) // for use of CCM RAM (64kB)
 
 enum { FILLEN = 256 };
 
 //----------------------------------------------------------------------------------------------------------
-//  typedef struct { float value, delta; } float_value_delta;
 
 void place_step_dd(float *buffer, int index, float phase, float w, float scale);
 void place_slope_dd(float *buffer, int index, float phase, float w, float slope_delta);
@@ -63,14 +65,57 @@ typedef struct
 	float   _p, _w, _z;
 	float   _f [FILLEN + STEP_DD_PULSE_LENGTH];
 	int     _j;
-	bool	_init = false;
+	bool	_init;
 
 } VCO_blepsaw_t;
 
-extern int period;
-extern int oversampling;
-
 void VCO_blepsaw_Init(VCO_blepsaw_t *vco);
 float VCO_blepsaw_SampleCompute(VCO_blepsaw_t *vco);
+
+//----------------------------------------------------------------------------------------------------------
+
+//	class VCO_bleprect
+
+typedef struct
+{
+	float	out;
+	float	amp;
+	float	last_amp;
+	float 	freq;
+	float	waveform;	// duty cycle, must be in [-1, 1]
+	float	syncin;
+	float	syncout;
+	float   _p, _w, _b, _x, _z;
+	float   _f [FILLEN + STEP_DD_PULSE_LENGTH];
+	int     _j, _k;
+	bool	_init;
+
+} VCO_bleprect_t ;
+
+void VCO_bleprect_Init(VCO_bleprect_t *vco);
+float VCO_bleprect_SampleCompute(VCO_bleprect_t *vco);
+
+//----------------------------------------------------------------------------------------------------------
+
+//		class VCO_bleptri
+
+typedef struct
+{
+	float	out;
+	float	amp;
+	float	last_amp;
+	float 	freq;
+	float	waveform;	// duty cycle, must be in [-1, 1]
+	float	syncin;
+	float	syncout;
+	float   _p, _w, _b, _z;
+	float   _f [FILLEN + LONGEST_DD_PULSE_LENGTH];
+	int     _j, _k;
+	bool	_init;
+
+} VCO_bleptri_t ;
+
+void VCO_bleptri_Init(VCO_bleptri_t *vco);
+float VCO_bleptri_SampleCompute(VCO_bleptri_t *vco);
 
 #endif /* _BLEPVCO_H */
