@@ -154,7 +154,7 @@ public:
 /**
  * This class computes pow with a fast algorithm described in 
  * http://www.hxa.name/articles/content/fast-pow-adjustable_hxa7241_2007.html
- * It internally allocates a table of size 2^precision and a 
+ * It internally allocates a table of size 2^precision+1 and a 
  * FastLog object of the same precision.
  * 
 */
@@ -163,7 +163,7 @@ class FastPow {
 private:
   /**
    * @_ilog2      one over log, to required radix, of two
-   * @_pTable     length must be 2 ^ _precision
+   * @_pTable     length must be 2^_precision+1
   */
 
   unsigned int* _pTable;
@@ -190,21 +190,23 @@ public:
     free(_pTable);
     _precision = precision;
     fastLog.setup(_precision);
-    _tableLength = 1 << _precision;
+    _tableLength = 1 << _precision + 1;
     _pTable=(unsigned int*)malloc(sizeof(unsigned int)*_tableLength);
     if(_pTable == NULL){
       exit(1);
     }
     /* step along table elements and x-axis positions */
-    float zeroToOne = 1.0f / ((float)(1 << _precision) * 2.0f);        /* A */
-    int   i;                                                          /* B */
-    for( i = 0;  i < (1 << _precision);  ++i )                         /* C */
+    float zeroToOne = 0.0f;
+    int   i;
+    for( i = 0;  i < ((1 << precision) + 1);  ++i )
     {
       /* make y-axis value for table element */
       const float f = ((float)::pow( 2.0f, zeroToOne ) - 1.0f) * _2p23; //make sure your call ::pow, otherwise you will be calling this class' method!
       _pTable[i] = (unsigned int)( f < _2p23 ? f : (_2p23 - 1.0f) );
       zeroToOne += 1.0f / (float)(1 << _precision);
-     }                                                                 /* D */
+    }
+    /* make integer power exact */
+    _pTable[0] = 0;
   }
 
   /**
@@ -221,8 +223,8 @@ public:
     /* build float bits */
     const int i = (int)( (exponent * (_2p23 * _ilog2)) + (127.0f * _2p23) );
 
-    /* replace mantissa with lookup */
-    const int it = (i & 0xFF800000) | _pTable[(i & 0x7FFFFF) >> (23 - _precision)];
+    /* (rounding mantissa-index before use) */
+    const int it = (i & 0xFF800000) | _pTable[((i & 0x7FFFFF) + (0x400000 >> _precision)) >> (23 - _precision)];
 
     /* convert bits to float */
     float out = *(const float*)( &it );
