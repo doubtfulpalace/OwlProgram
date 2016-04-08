@@ -218,8 +218,6 @@ public:
    */
   float getPow(float exponent)
   {
-    /* strip the sign */
-    static const float _2p23 = 8388608.0f;
     /* build float bits */
     const int i = (int)( (exponent * (_2p23 * _ilog2)) + (127.0f * _2p23) );
 
