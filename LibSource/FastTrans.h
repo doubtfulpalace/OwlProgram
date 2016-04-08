@@ -59,6 +59,9 @@ Vinyals, O., G. Friedland, and N. Mirghafori. "Revisiting a basic function on cu
  * algorithm described in
  * http://www.icsi.berkeley.edu/pubs/techreports/TR-07-002.pdf
  * It internally allocates a table of size 2^precision.
+ *
+ * If you already instantiated an object of the class FastPow,
+ * then you can use the FastLog object already instantiated in there.
 */
 
 class FastLog{
@@ -129,6 +132,22 @@ public:
     arg = ((arg + log_2)* 0.69314718);
     return arg; //natural logarithm
   }
+  
+ /** 
+   * Computes the logarithm.
+   * 
+   * Computes an approximation of log_{base}(arg)
+   * using the internal FastLog object
+   *
+   * @param base the base of the logarithm. 
+   * @param arg the argument of the logaritm
+   * @return log(arg), or 0 if arg<=0
+   */
+  float log(float base, float arg){
+    //log_b(x) = log_e(x) / log_e(b)
+    return this->log(arg) / this->log(base);
+  }
+
 };
 
 
@@ -164,7 +183,7 @@ public:
   /**
    * Initialize powFast lookup table.
    *
-   * @param precision  number of mantissa bits used, must be 0 =< precision <= 18
+   * @param precision number of mantissa bits used, must be 0 =< precision <= 18
    */
   void setup(const unsigned int precision)
   {
@@ -182,7 +201,7 @@ public:
     for( i = 0;  i < (1 << _precision);  ++i )                         /* C */
     {
       /* make y-axis value for table element */
-      const float f = ((float)::pow( 2.0f, zeroToOne ) - 1.0f) * _2p23;
+      const float f = ((float)::pow( 2.0f, zeroToOne ) - 1.0f) * _2p23; //make sure your call ::pow, otherwise you will be calling this class' method!
       _pTable[i] = (unsigned int)( f < _2p23 ? f : (_2p23 - 1.0f) );
       zeroToOne += 1.0f / (float)(1 << _precision);
      }                                                                 /* D */
@@ -198,8 +217,6 @@ public:
   float getPow(float exponent)
   {
     /* strip the sign */
-    //  float sig = exponent >= 0;
-    //  exponent = sig ? exponent : -exponent;
     static const float _2p23 = 8388608.0f;
     /* build float bits */
     const int i = (int)( (exponent * (_2p23 * _ilog2)) + (127.0f * _2p23) );
@@ -210,8 +227,6 @@ public:
     /* convert bits to float */
     float out = *(const float*)( &it );
     
-    /* re-attach the sign */
-    //  out = sig ? out : -out;
     return out;
   }
   
@@ -221,7 +236,7 @@ public:
    * @param base radix
    */
   void setBase(const float base){
-    _ilog2 = fastLog.log(base) * 1.44269504088896;
+    _ilog2 = computeIlog(base);
   }
   
   /**
@@ -236,8 +251,24 @@ public:
     setBase(base);
     return getPow(exponent);
   }
+  
+  /**
+   * Compute fast pow.
+   *
+   * @param ilog2 log(base)*1.44269504088896
+   * @param exponent exponent
+   *
+   * @return radix^exponent
+   */
+  float powIlog(float ilog2, float exponent){
+    _ilog2 = ilog2;
+    return getPow(exponent);
+  }
 
-  /* Computes an approximation of log(val) quickly
+  /** 
+   * Computes the logarithm.
+   * 
+   * Computes an approximation of logn(val)
    * using the internal FastLog object
    *
    * @param arg the argument of the logarithm. 
@@ -245,6 +276,31 @@ public:
    */
   float log(float arg){
     return fastLog.log(arg);
+  }
+  
+   /** 
+   * Computes the logarithm.
+   * 
+   * Computes an approximation of log_{base}(arg)
+   * using the internal FastLog object
+   *
+   * @param base the base of the logarithm. 
+   * @param arg the argument of the logaritm
+   * @return log(arg), or 0 if arg<=0
+   */
+  float log(float base, float arg){
+    return fastLog.log(base, arg);
+  }
+
+  /**
+   * Computes the ilog2 to pass to powIlog
+   *
+   * @param base the base of the logarithm
+   * 
+   * @return the ilog2
+   */
+  float const computeIlog(float base){
+    return log(base)*1.44269504088896;
   }
 };
 

@@ -43,7 +43,7 @@ public:
     registerParameter(PARAMETER_A, "toggleFast");
     registerParameter(PARAMETER_B, "toggleSetBase");
     registerParameter(PARAMETER_C, "computeError");
-    registerParameter(PARAMETER_C, "precision");
+    registerParameter(PARAMETER_D, "precision");
   }
   ~FastTransTestPatch(){
   }
@@ -84,17 +84,18 @@ public:
         for(int n = 0; n < faL.getSize(); n++){
           float base = faR[n];
           float exponent = faL[n];
-          faR[n] = powf(base,exponent);
+          faR[n] = powf(base, exponent);
         }
         debugMessage("regular, precision", precision);
       }
-      
       
     if(computeError){
       if(oldComputeError == false){
         maxError = -1;
       }
-      for(int n = 0; n < faL.getSize(); n++){
+      // this is just to evaluate accuracy and check that fastpowf and fastexpf work properly
+      // as such, we traverse only half of the array to make sure we do not exceed 100% CPU 
+      for(int n = 0; n < faL.getSize()/2; n++){ 
         float base = faR[n];
         float exponent = faL[n];
         fastPow.setBase(base);
@@ -102,6 +103,11 @@ public:
         float exact = powf(base, exponent);
         float error = fabsf(approx - exact) / exact * 100;
         maxError = maxError > error ? maxError : error;
+        if(precision == 14){ //14 is the default precision of fastpowf
+          ASSERT(fastPow.pow(base, exponent) == fastpowf(base, exponent), "fastPow.getPow!=fastpowf");
+          ASSERT(fastPow.pow(exp(1),exponent) == fastexpf(exponent), "fastPow.getPow!=fastexpf");
+        }
+        ASSERT(approx == fastPow.pow(base, exponent), "fastPow.getPow!=fastPow.pow");
       }
       debugMessage("MaximumPercentageError, precision ", maxError, precision);
     }
