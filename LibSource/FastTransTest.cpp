@@ -21,32 +21,32 @@ int main(){
       float perc = err/exact * 100;
       maxPerc = maxPerc > perc ? maxPerc : perc;
       //  printf("%.3f^%.3f = %.3f %.3f %.3f%%\n", base, exponent, exact, approx, perc);
-      float powresult = fastPow.pow(base, exponent);
-      float fastpowresult = approx;
-      if(fastpowresult != powresult){
-        printf("fastpowresult != fastPow.pow(base, exponent), approx: %f, powresult: %f, base %f, exponent %f", approx, powresult, base, exponent);
-        exit(1);
-      }
-      float fastpowfresult = fastpowf(base, exponent);
-      if(approx != fastpowfresult){
-        printf("fastpowresult != fastpowf(base, exponent), approx: %f, powresult: %f, base %f, exponent %f", approx, fastpowfresult, base, exponent);
-        exit(1);
-      }
-      float fastexpfresult = fastexpf(exponent);
-      fastpowfresult = fastpowf(exp(1), exponent);
-      if(fastpowfresult != fastexpfresult){
-        printf("fastexpfresult != fastpowfresult(base, exponent), approx: %f, powresult: %f, exponent %f", fastexpfresult, fastpowfresult, exponent);
-        exit(1);
-      }
-      float fastpowf2fresult = fastpow2f(exponent);
-      fastpowfresult = fastpowf(2, exponent);
-      if(fastpowfresult != fastpowf2fresult){
-        printf("fastpowf2fresult != fastpowfresult(base, exponent), approx: %f, powresult: %f, exponent %f", 
-          fastpowf2fresult, fastpowfresult, exponent);
-        exit(1);
-      }
-      exact = powf(2, exponent);
-      //  printf("pow2f %f, fastpow2f %f (%f%%)\n", exact, fastpowf2fresult, fabsf(exact-fastpowf2fresult)/exact*100);
+      //  float powresult = fastPow.pow(base, exponent);
+      //  float fastpowresult = approx;
+      //  if(fastpowresult != powresult){
+        //  printf("fastpowresult != fastPow.pow(base, exponent), approx: %f, powresult: %f, base %f, exponent %f", approx, powresult, base, exponent);
+        //  exit(1);
+      //  }
+      //  float fastpowfresult = fastpowf(base, exponent);
+      //  if(approx != fastpowfresult){
+        //  printf("fastpowresult != fastpowf(base, exponent), approx: %f, powresult: %f, base %f, exponent %f", approx, fastpowfresult, base, exponent);
+        //  exit(1);
+      //  }
+      //  float fastexpfresult = fastexpf(exponent);
+      //  fastpowfresult = fastpowf(exp(1), exponent);
+      //  if(fastpowfresult != fastexpfresult){
+        //  printf("fastexpfresult != fastpowfresult(base, exponent), approx: %f, powresult: %f, exponent %f", fastexpfresult, fastpowfresult, exponent);
+        //  exit(1);
+      //  }
+      float fastpowf2fresult = fastPow.pow(base, exponent);
+      //  fastpowfresult = fastpowf(2, exponent);
+      //  if(fastpowfresult != fastpowf2fresult){
+        //  printf("fastpowf2fresult != fastpowfresult(base, exponent), approx: %f, powresult: %f, exponent %f", 
+          //  fastpowf2fresult, fastpowfresult, exponent);
+        //  exit(1);
+      //  }
+      exact = powf(base, exponent);
+      printf("pow2f %f, fastpow2f %f (%f%%)\n", exact, fastpowf2fresult, fabsf(exact-fastpowf2fresult)/exact*100);
       //  exit(1);
       //TODO check for maxError of fastpow2f
     }

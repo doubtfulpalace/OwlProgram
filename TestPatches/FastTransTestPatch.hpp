@@ -38,78 +38,84 @@ class FastTransTestPatch : public Patch {
 public:
   FastTransTestPatch()
   {
-    precision = 11;
+    precision = 14;
     fastPow.setup(precision);
     registerParameter(PARAMETER_A, "toggleFast");
-    registerParameter(PARAMETER_B, "toggleSetBase");
+    registerParameter(PARAMETER_B, "pow1/2");
     registerParameter(PARAMETER_C, "computeError");
     registerParameter(PARAMETER_D, "precision");
   }
   ~FastTransTestPatch(){
   }
   void processAudio(AudioBuffer &buffer){
-    static float maxError = -1; 
+    static float maxError1 = -1; 
     bool fast = getParameterValue(PARAMETER_A) > 0.5;
-    bool setBaseOn = getParameterValue(PARAMETER_B) > 0.5;
+    bool numbertwo = getParameterValue(PARAMETER_B) > 0.5;
     bool computeError = getParameterValue(PARAMETER_C) > 0.5;
     float p = getParameterValue(PARAMETER_D);
     static float pp = 0;
-    if(fabsf(pp-p) > 0.03){ //filter out noisy readings
-      precision = p * 20;
-      pp = p;
-      fastPow.setup(precision);
-    }
     
     static bool oldComputeError = false;
     FloatArray faL=buffer.getSamples(0);
     FloatArray faR=buffer.getSamples(1);
-    for(int k = 0; k < 4; k++)
-      if(fast){
-        if(setBaseOn){
+    if(!computeError){
+      for(int k = 0; k < 15; k++){
+        if(fast){
+          if(!numbertwo){
+            for(int n = 0; n < faL.getSize(); n++){
+              float base = faR[n];
+              float exponent = faL[n];
+              fastPow.setBase(base);
+              faR[n] = fastPow.getPow(exponent);
+            }
+            debugMessage("fast, setBase, precision", precision);
+          } else { /* if(numbertwo) */ //use whatever the last base was
+            for(int n = 0; n < faL.getSize(); n++){
+              float base = faR[n];
+              float exponent = faL[n];
+              faR[n] = fastPow.getPow(exponent);
+            }
+            debugMessage("fast, noSetBase, precision", precision);
+          }
+        } else { /* if(fast) */
           for(int n = 0; n < faL.getSize(); n++){
             float base = faR[n];
             float exponent = faL[n];
-            fastPow.setBase(base);
-            faR[n] = fastPow.getPow(exponent);
+            faR[n] = powf(base, exponent);
           }
-          debugMessage("fast, setBase, precision", precision);
-        } else { /* if(setBaseOn) */ //use whatever the last base was
-          for(int n = 0; n < faL.getSize(); n++){
-            float exponent = faL[n];
-            faR[n] = fastPow.getPow(exponent);
-          }
-          debugMessage("fast, noSetBase, precision", precision);
+          debugMessage("regular, precision", precision);
         }
-      } else { /* if(fast) */
-        for(int n = 0; n < faL.getSize(); n++){
-          float base = faR[n];
-          float exponent = faL[n];
-          faR[n] = powf(base, exponent);
-        }
-        debugMessage("regular, precision", precision);
-      }
-      
-    if(computeError){
+      } /* for */      
+    } else {
       if(oldComputeError == false){
-        maxError = -1;
+        maxError1 = -1;
       }
-      // this is just to evaluate accuracy and check that fastpowf and fastexpf work properly
-      // as such, we traverse only half of the array to make sure we do not exceed 100% CPU 
-      for(int n = 0; n < faL.getSize()/2; n++){ 
-        float base = faR[n];
-        float exponent = faL[n];
-        fastPow.setBase(base);
-        float approx = fastPow.getPow(exponent);
+      // this is just to evaluate accuracy and check that fastpowf and fastexpf work properly.
+      // As such, we traverse only half of the array to make sure we do not exceed 100% CPU 
+      static float eb, ee;
+      faL.noise();
+      faL.add(2);
+      faR.noise();
+      faR.add(2);
+      float error1;
+      float base;
+      float exponent;
+      for(int n = 0; n < faL.getSize()/4; n++){ 
+        base = faR[n];
+        exponent = faL[n];
         float exact = powf(base, exponent);
-        float error = fabsf(approx - exact) / exact * 100;
-        maxError = maxError > error ? maxError : error;
-        if(precision == 14){ //14 is the default precision of fastpowf
-          ASSERT(fastPow.pow(base, exponent) == fastpowf(base, exponent), "fastPow.getPow!=fastpowf");
-          ASSERT(fastPow.pow(exp(1),exponent) == fastexpf(exponent), "fastPow.getPow!=fastexpf");
+        float approx = fastPow.pow(base, exponent);
+        error1 = fabsf(approx - exact) / exact * 100;
+        if(maxError1 < error1 && base != 0){
+          maxError1 = error1;
+          eb = base;
+          ee = exponent;
         }
-        ASSERT(approx == fastPow.pow(base, exponent), "fastPow.getPow!=fastPow.pow");
+        ASSERT(fastPow.pow(base, exponent) == fastpowf(base, exponent), "fastPow.getPow!=fastpowf");
+        ASSERT(fastPow.pow(exp(1),exponent) == fastexpf(exponent), "fastPow.getPow!=fastexpf");
       }
-      debugMessage("MaximumPercentageError, precision ", maxError, precision);
+      //  debugMessage("MaximumPercentageError, precision ", maxError1, eb*10000000, ee*10000000);
+      debugMessage("MaximumPercentageError, precision ", maxError1, base, exponent);
     }
     oldComputeError = computeError;
   }

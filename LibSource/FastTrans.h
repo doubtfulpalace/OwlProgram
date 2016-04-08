@@ -87,7 +87,7 @@ public:
    */
   void setup(unsigned int precision){
     n = precision;
-    
+    free(lookup_table);
     lookup_table = (float*)malloc(sizeof(float)*(1 << n)) ;
     fill_icsi_log_table();
   }
@@ -154,59 +154,60 @@ public:
 /**
  * This class computes pow with a fast algorithm described in 
  * http://www.hxa.name/articles/content/fast-pow-adjustable_hxa7241_2007.html
- * It internally allocates a table of size 2^precision+1 and a 
- * FastLog object of the same precision.
+ * It internally allocates two tables of size 2^9(sizeof(float)) each  and a 
+ * FastLog object of the given precision.
  * 
 */
-
 class FastPow {
 private:
   /**
    * @_ilog2      one over log, to required radix, of two
-   * @_pTable     length must be 2^_precision+1
   */
-
-  unsigned int* _pTable;
-  unsigned int _tableLength;
+  float* tableH_m;
+  float* tableL_m;
   static constexpr float _2p23 = 8388608.0f;
   unsigned int _precision;
   float _ilog2;
   FastLog fastLog;
+  void setTable(float* const pTable, const unsigned int precision,
+     const unsigned int extent, const bool isRound)
+  {
+    // step along table elements and x-axis positions
+    float zeroToOne = !isRound ?
+      0.0f : (1.0f / (static_cast<float>(1 << precision) * 2.0f));
+    for( int i = 0;  i < (1 << extent);  ++i )
+    {
+      // make y-axis value for table element
+      pTable[i] = ::powf( 2.0f, zeroToOne );
+
+      zeroToOne += 1.0f / static_cast<float>(1 << precision);
+    }
+  }
 public:
   FastPow(){
-    _pTable = NULL;
+    tableH_m = NULL;
+    tableL_m = NULL;
   }
   ~FastPow(){
-    free(_pTable);
+    free(tableH_m);
+    free(tableL_m);
   }
   
   /**
    * Initialize powFast lookup table.
    *
-   * @param precision number of mantissa bits used, must be 0 =< precision <= 18
+   * @param precision of the associated log table, must be 0 =< precision <= 23
    */
   void setup(const unsigned int precision)
   {
-    free(_pTable);
+    free(tableH_m);
+    free(tableL_m);
+    tableH_m=(float*)malloc(sizeof(float)*(1 << 9));
+    tableL_m=(float*)malloc(sizeof(float)*(1 << 9));
+    setTable(tableH_m,  9, 9, false);
+    setTable(tableL_m, 18, 9, true);
     _precision = precision;
     fastLog.setup(_precision);
-    _tableLength = 1 << _precision + 1;
-    _pTable=(unsigned int*)malloc(sizeof(unsigned int)*_tableLength);
-    if(_pTable == NULL){
-      exit(1);
-    }
-    /* step along table elements and x-axis positions */
-    float zeroToOne = 0.0f;
-    int   i;
-    for( i = 0;  i < ((1 << precision) + 1);  ++i )
-    {
-      /* make y-axis value for table element */
-      const float f = ((float)::pow( 2.0f, zeroToOne ) - 1.0f) * _2p23; //make sure your call ::pow, otherwise you will be calling this class' method!
-      _pTable[i] = (unsigned int)( f < _2p23 ? f : (_2p23 - 1.0f) );
-      zeroToOne += 1.0f / (float)(1 << _precision);
-    }
-    /* make integer power exact */
-    _pTable[0] = 0;
   }
 
   /**
@@ -216,20 +217,22 @@ public:
    *
    * @return radix^exponent
    */
-  float getPow(float exponent)
+  float getPow(const float val)
   {
-    /* build float bits */
-    const int i = (int)( (exponent * (_2p23 * _ilog2)) + (127.0f * _2p23) );
+    const float _2p23 = 8388608.0f;
 
-    /* (rounding mantissa-index before use) */
-    const int it = (i & 0xFF800000) | _pTable[((i & 0x7FFFFF) + (0x400000 >> _precision)) >> (23 - _precision)];
+    // build float bits
+    const int i = static_cast<int>( (val * (_2p23 * _ilog2)) + (127.0f * _2p23) );
 
-    /* convert bits to float */
-    float out = *(const float*)( &it );
-    
-    return out;
+    // replace mantissa with combined lookups
+    const float t  = tableH_m[(i >> 14) & 0x1FF] * tableL_m[(i >> 5) & 0x1FF];
+    const int   it = (i & 0xFF800000) |
+        (*reinterpret_cast<const int*>( &t ) & 0x7FFFFF);
+
+    // convert bits to float
+    return *reinterpret_cast<const float*>( &it );
   }
-  
+
   /**
    * Sets the radix.
    *
@@ -303,5 +306,6 @@ public:
     return log(base)*1.44269504088896;
   }
 };
+
 
 #endif /* FASTTRANS_HPP */
