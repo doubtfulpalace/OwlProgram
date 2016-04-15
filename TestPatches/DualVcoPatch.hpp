@@ -1,5 +1,5 @@
-#ifndef __DualSynthVoicePatch_hpp__
-#define __DualSynthVoicePatch_hpp__
+#ifndef __DualVcoPatch_hpp__
+#define __DualVcoPatch_hpp__
 
 #include "StompBox.h"
 #include "Envelope.h"
@@ -7,16 +7,18 @@
 #include "PolyBlepOscillator.h"
 #include "BiquadFilter.h"
 
-/*
- * A: Pitch
- * B: Fc exp
- * C: Resonance
- * D: Envelope / amplitude
- * E: Waveshape
- * Left: Pitch
- * Right: Fc lin
+/**
+ * Two oscillators. Osc2 can FM osc1 and they both can take FM 
+ * from audio inputs
+ * A: Pitch1
+ * B: Pitch2
+ * C: Amount of frequency modulation osc2->osc1
+ * D: Waveform
+ * Left: Pitch1
+ * Right: Pitch2
+ * 
  */
-class DualSynthVoicePatch : public Patch {
+class DualVcoPatch : public Patch {
 private:
   PolyBlepOscillator osc1;
   PolyBlepOscillator osc2;
@@ -24,14 +26,14 @@ private:
   VoltsPerOctave hz2;
   FloatArray temp;
 public:
-  DualSynthVoicePatch() : osc1(getSampleRate()), osc2(getSampleRate()) {
+  DualVcoPatch() : osc1(getSampleRate()), osc2(getSampleRate()) {
     registerParameter(PARAMETER_A, "Tune1");
     registerParameter(PARAMETER_B, "Tune2");
-    registerParameter(PARAMETER_C, "Cross-modulation");
+    registerParameter(PARAMETER_C, "Frequency modulation");
     registerParameter(PARAMETER_D, "Waveform");
     temp = FloatArray::create(getBlockSize());
   }
-  ~DualSynthVoicePatch(){
+  ~DualVcoPatch(){
     FloatArray::destroy(temp);
   }
   void processAudio(AudioBuffer &buffer) {
@@ -56,17 +58,22 @@ public:
     osc2.setShape(shape);
     osc2.setPulseWidth(pw);
     
-    for(int n = 0; n < left.getSize(); n++){
-      // osc2 is frequency modulated by the right input
-      osc2.setFrequency(hz2.getFrequency(right[n]));
-      right[n] =  osc2.getNextSample();
+    hz2.getFrequency(right, temp);
+    osc2.getSamples(right, temp);
+    
+    // osc1's frequency is modulated by the left input
+    // and by osc2's output
+    right.multiply(2.5 * modulationIndex, temp); 
+    temp.add(left);
+    hz1.getFrequency(temp);
+    osc1.getSamples(left, temp);
       
-      // osc1 is frequency modulated by osc2 and left input
-      osc1.setFrequency(hz1.getFrequency(left[n] + 2.5*modulationIndex*right[n]));
-      left[n] = osc1.getNextSample();
-    }
     right.add(left);
+    right.multiply(0.5);
+    
+    left.multiply(0.011); 
+    right.multiply(0.011);
   }
 };
 
-#endif   // __DualSynthVoicePatch_hpp__
+#endif   // __DualVcoPatch_hpp__
