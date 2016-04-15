@@ -34,3 +34,8 @@ float PolyBlepOscillator::getNextSample(){
 void PolyBlepOscillator::getSamples(FloatArray samples){
   osc.Render<true>(frequency, pw, shape, samples, samples.getSize());
 }
+
+void PolyBlepOscillator::getSamples(FloatArray samples, FloatArray frequency){
+  frequency.multiply(multiplier);
+  osc.Render<true>(frequency, pw, shape, samples, samples.getSize());
+}

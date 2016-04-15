@@ -20,6 +20,7 @@ public:
   void setPulseWidth(float value);
   float getNextSample();
   void getSamples(FloatArray samples);
+  void getSamples(FloatArray samples, FloatArray frequency);
 };
 
 #endif /* __PolyBlepOscillator_h__ */
