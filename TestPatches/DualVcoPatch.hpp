@@ -70,9 +70,6 @@ public:
       
     right.add(left);
     right.multiply(0.5);
-    
-    left.multiply(0.011); 
-    right.multiply(0.011);
   }
 };
 
