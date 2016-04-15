@@ -1,5 +1,5 @@
 #include <inttypes.h>
-
+#define FASTPOW_PRECISION 14
 #define DEBUG_MEM
 /* #define DEBUG_DWT */
 /* #define STARTUP_CODE */

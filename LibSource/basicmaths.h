@@ -58,6 +58,7 @@
    // fast approximations
    float fastexpf(float x);
    float fastlog2f(float x);
+   float fastlog2f_(float x);
    float fastpow2f(float x);
    float fastpowf(float a, float b);
    float fastatan2f(float a, float b);
