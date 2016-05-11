@@ -37,7 +37,6 @@ AudioBuffer* PatchProcessor::createMemoryBuffer(int channels, int size){
 #define SMOOTH_HYSTERESIS
 #define SMOOTH_FACTOR 3
 void PatchProcessor::setParameterValues(uint16_t *params){
-  if(1)return;
   /* Implements an exponential moving average (leaky integrator) to smooth ADC values
    * y(n) = (1-alpha)*y(n-1) + alpha*y(n)
    * with alpha=0.5, fs=48k, bs=128, then w0 ~= 18hz
@@ -51,7 +50,7 @@ void PatchProcessor::setParameterValues(uint16_t *params){
       if(i<4)
         parameters[i] = parameters[i]*SMOOTH_FACTOR + (4095 - params[i])/(SMOOTH_FACTOR+1);
       else
-        parameters[i] = (parameters[i]*SMOOTH_FACTOR - params[i])/(SMOOTH_FACTOR+1);
+        parameters[i] = (parameters[i]*SMOOTH_FACTOR + params[i])/(SMOOTH_FACTOR+1);
     }
   }else{
     for(int i=0; i<NOF_ADC_VALUES; ++i)
