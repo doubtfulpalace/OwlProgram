@@ -6,6 +6,7 @@ CPP_SRC += FloatArray.cpp ComplexFloatArray.cpp FastFourierTransform.cpp
 CPP_SRC += Envelope.cpp VoltsPerOctave.cpp Window.cpp
 CPP_SRC += WavetableOscillator.cpp PolyBlepOscillator.cpp
 CPP_SRC += PatchProgram.cpp SmoothValue.cpp PatchParameter.cpp
+CPP_SRC += Resource.cpp
 
 SOURCE       = $(BUILDROOT)/Source
 LIBSOURCE    = $(BUILDROOT)/LibSource
