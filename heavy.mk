@@ -2,7 +2,7 @@ HEAVYFILE   ?= $(HEAVY).pd
 HEAVYNAME   ?= owl
 HEAVYSRC    ?= $(BUILDROOT)/HeavySource
 HEAVYDIR    ?= $(BUILD)/Heavy
-HEAVYARGS   ?= -r 1 # release version, see https://enzienaudio.com/a/releases
+HEAVYARGS   ?= -r r2016.07.05 # release version, see https://enzienaudio.com/a/releases
 ifdef HEAVYTOKEN
 HEAVYARGS   += -t $(HEAVYTOKEN)
 endif

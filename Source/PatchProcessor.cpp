@@ -5,6 +5,7 @@
 #include <string.h>
 #include "ProgramVector.h"
 #include "SmoothValue.h"
+#include "basicmaths.h"
 
 PatchProcessor::PatchProcessor() 
   : patch(NULL), bufferCount(0), parameterCount(0) {
@@ -99,7 +100,7 @@ public:
   }
   void update(int16_t newValue){
     float v = newValue/4096.0f;
-    v = expf(logf(v)/skew);
+    v = fastexpf(fastlogf(v)/skew);
     value = v*(maximum-minimum)+minimum;
     if(parameter != NULL)
       parameter->update((T)value);

@@ -83,6 +83,22 @@ float fastlog2f(float b){
   return fastPow.log(b) * ilog;
 }
 
+float fastlog10f(float b){
+  // todo: test!
+  if(fastPowInitialized == 0)
+    initializeFastPow(FASTPOW_PRECISION);
+  static float ilog = 1/fastPow.log(10);
+  return fastPow.log(b) * ilog;
+}
+
+float fastlogf(float b){
+  // todo: test!
+  if(fastPowInitialized == 0)
+    initializeFastPow(FASTPOW_PRECISION);
+  static float ilog = 1/fastPow.log(M_E);
+  return fastPow.log(b) * ilog;
+}
+
 /* Fast arctan2
  * from http://dspguru.com/dsp/tricks/fixed-point-atan2-with-self-normalization
  */

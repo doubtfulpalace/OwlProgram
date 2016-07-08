@@ -57,10 +57,12 @@
 
    // fast approximations
    float fastexpf(float x);
-   float fastlog2f(float x);
-   float fastlog2f_(float x);
-   float fastpow2f(float x);
    float fastpowf(float a, float b);
+   float fastpow2f(float x);
+   /* todo: float fastpow10f(float x); */
+   float fastlogf(float x);
+   float fastlog2f(float x);
+   float fastlog10f(float x);
    float fastatan2f(float a, float b);
 
 #ifdef __cplusplus
@@ -83,12 +85,16 @@
 // fast approximate math functions
 #define atan2(x, y) fastatan2f(x, y)
 #define atan2f(x, y) fastatan2f(x, y)
-/* #define pow(x, y) fastpowf(x, y) */
-/* #define powf(x, y) fastpowf(x, y) */
+#define pow(x, y) fastpowf(x, y)
+#define powf(x, y) fastpowf(x, y)
+
+/* #define log(x) fastlogf(x) */
+/* #define logf(x) fastlogf(x) */
+
 /* Fast exponentiation function, y = e^x */
 /* 1.0 / ln(2) = 1.442695041f */
-/* #define exp(x) fastpow2f(x * 1.442695041f) */
-/* #define expf(x) fastpow2f(x * 1.442695041f) */
+#define exp(x) fastpow2f(x * 1.442695041f)
+#define expf(x) fastpow2f(x * 1.442695041f)
 #endif
 
 #undef RAND_MAX
