@@ -1,11 +1,11 @@
 BUILDROOT ?= .
 
 C_SRC   = basicmaths.c heap_5.c # sbrk.c
-CPP_SRC = main.cpp operators.cpp message.cpp StompBox.cpp PatchProcessor.cpp
+CPP_SRC = main.cpp operators.cpp message.cpp Patch.cpp PatchProcessor.cpp
 CPP_SRC += FloatArray.cpp ComplexFloatArray.cpp FastFourierTransform.cpp 
-CPP_SRC += Envelope.cpp VoltsPerOctave.cpp
+CPP_SRC += Envelope.cpp VoltsPerOctave.cpp Window.cpp
 CPP_SRC += WavetableOscillator.cpp PolyBlepOscillator.cpp
-CPP_SRC += PatchProgram.cpp
+CPP_SRC += PatchProgram.cpp SmoothValue.cpp PatchParameter.cpp
 
 SOURCE       = $(BUILDROOT)/Source
 LIBSOURCE    = $(BUILDROOT)/LibSource
@@ -78,13 +78,13 @@ $(BUILD)/PatchProgram.o: $(SOURCE)/PatchProgram.cpp $(DEPS)
 	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -I$(BUILD) $(SOURCE)/PatchProgram.cpp -o $@
 	@$(CXX) -MM -MT"$@" $(CPPFLAGS) $(CXXFLAGS) -I$(BUILD) $(SOURCE)/PatchProgram.cpp > $(@:.o=.d)
 
-$(BUILD)/patch.elf: $(PATCH_OBJS) $(OBJS) $(LDSCRIPT)
+$(BUILD)/$(TARGET).elf: $(PATCH_OBJS) $(OBJS) $(LDSCRIPT)
 	@$(LD) $(LDFLAGS) -o $@ $(PATCH_OBJS) $(OBJS) $(LDLIBS)
 
-as: $(BUILD)/patch.elf
-	@$(OBJDUMP) -S $< > $(BUILD)/patch.s
+as: $(BUILD)/$(TARGET).elf
+	@$(OBJDUMP) -S $< > $(BUILD)/$(TARGET).s
 
 map: $(PATCH_OBJS) $(OBJS) $(LDSCRIPT)
-	@$(LD) $(LDFLAGS) -Wl,-Map=$(BUILD)/patch.map $(OBJS) $(PATCH_OBJS) $(LDLIBS)
+	@$(LD) $(LDFLAGS) -Wl,-Map=$(BUILD)/$(TARGET).map $(OBJS) $(PATCH_OBJS) $(LDLIBS)
 
-compile: $(BUILD)/patch.bin
+compile: $(BUILD)/$(TARGET).bin

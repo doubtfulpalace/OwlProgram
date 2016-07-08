@@ -2,8 +2,9 @@ HEAVYFILE   ?= $(HEAVY).pd
 HEAVYNAME   ?= owl
 HEAVYSRC    ?= $(BUILDROOT)/HeavySource
 HEAVYDIR    ?= $(BUILD)/Heavy
+HEAVYARGS   ?= -r 1 # release version, see https://enzienaudio.com/a/releases
 ifdef HEAVYTOKEN
-HEAVYARGS   = -t $(HEAVYTOKEN)
+HEAVYARGS   += -t $(HEAVYTOKEN)
 endif
 
 $(HEAVYDIR)/_main.pd: $(PATCHSOURCE)/$(HEAVYFILE)
@@ -12,7 +13,7 @@ $(HEAVYDIR)/_main.pd: $(PATCHSOURCE)/$(HEAVYFILE)
 	@cp -f $< $@
 
 $(BUILD)/Source/Heavy_owl.h: $(HEAVYDIR)/_main.pd
-	@python ./Tools/Heavy/uploader.py $(HEAVYDIR) -g c -n $(HEAVYNAME) -o $(BUILD)/Source $(HEAVYARGS)
-	@cp $(HEAVYSRC)/HvUtils.h $(HEAVYSRC)/HvMessage.c $(HEAVYSRC)/MessagePool.c $(BUILD)/Source
+	@python2.7 ./Tools/Heavy/uploader.py $(HEAVYDIR) -g c -n $(HEAVYNAME) -o $(BUILD)/Source $(HEAVYARGS)
+	@cp $(HEAVYSRC)/HvUtils.h $(HEAVYSRC)/HvMessage.c $(BUILD)/Source
 
 heavy: $(BUILD)/Source/Heavy_owl.h

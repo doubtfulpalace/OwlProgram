@@ -33,6 +33,9 @@ extern "C"{
   char* WEB_getStatus();
   char* WEB_getPatchName();
   char* WEB_getParameterName(int pid);
+
+  void *pvPortMalloc( size_t xWantedSize );
+  void vPortFree( void *pv );
 }
 
 extern "C"{
@@ -51,7 +54,7 @@ unsigned long systicks(){
 #define NOF_PARAMETERS 16
 static int blocksize;
 static char* patchName = NULL;
-static uint16_t parameters[NOF_PARAMETERS];
+static int16_t parameters[NOF_PARAMETERS];
 static char* parameterNames[NOF_PARAMETERS];
 static volatile uint16_t buttons = 1<<2; // GREEN
 
@@ -61,7 +64,11 @@ void WEB_setParameter(int pid, float value){
 }
 
 void WEB_setButtons(int values){
-  buttons = values;
+  if(values != buttons){
+    if((buttons&(1<<PUSHBUTTON)) != (values&(1<<PUSHBUTTON)))
+      getInitialisingPatchProcessor()->patch->buttonChanged(PUSHBUTTON, values&(1<<PUSHBUTTON)?4095:0, 0);
+    buttons = values;
+  }
 }
 
 int WEB_getButtons(){
@@ -221,4 +228,17 @@ void programStatus(ProgramVectorAudioStatus status){}
 
 int serviceCall(int service, void** params, int len){
   return -1;
+}
+
+void *pvPortMalloc( size_t xWantedSize ){
+#ifdef malloc
+#undef malloc
+#endif
+  return malloc(xWantedSize);
+}
+void vPortFree( void *pv ){
+#ifdef free
+#undef free
+#endif
+  free(pv);
 }

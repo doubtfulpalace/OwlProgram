@@ -1,4 +1,4 @@
-#include "StompBox.h"
+#include "Patch.h"
 #include "message.h"
 #include <string.h>
 #include <stdlib.h>
@@ -30,7 +30,8 @@ class ManagedMemoryBuffer : public MemoryBuffer {
 public:
   ManagedMemoryBuffer(int ch, int sz) :
     MemoryBuffer(new float[ch*sz], ch, sz) {
-    ASSERT(buffer != NULL, "Memory allocation failed");
+    if(buffer == NULL)
+      error(OUT_OF_MEMORY_ERROR_STATUS, "Out of memory");
   }
   ~ManagedMemoryBuffer(){
     delete buffer;
