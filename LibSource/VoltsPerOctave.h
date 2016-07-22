@@ -33,7 +33,7 @@ public:
   float voltsToSample(float volts){
     return volts / multiplier + offset;
   }
-  float herzToVolts(float hertz){
+  float hertzToVolts(float hertz){
     return log2f(hertz/440.0f);
   }
   void getFrequency(FloatArray samples, FloatArray output);

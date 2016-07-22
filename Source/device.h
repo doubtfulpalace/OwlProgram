@@ -1,7 +1,6 @@
 #include <inttypes.h>
 #define FASTPOW_PRECISION 14
 #define DEBUG_MEM
-/* #define DEBUG_DWT */
 /* #define STARTUP_CODE */
 
 #define AUDIO_BIGEND
@@ -12,8 +11,7 @@
 
 #define MAX_BUFFERS_PER_PATCH        8
 #define MAX_NUMBER_OF_PATCHES        32
-
-#define NOF_ADC_VALUES               5
+#define MAX_NUMBER_OF_PARAMETERS     24
 
 #define LED_PORT                     GPIOE
 #define LED_GREEN                    GPIO_Pin_5
@@ -24,9 +22,9 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-   void assert_failed(uint8_t* file, uint32_t line);
+   void assert_failed(const char* msg, const char* location, int line);
 #ifdef __cplusplus
 }
 #endif
-#define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
+#define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, "", __LINE__))
 #endif
