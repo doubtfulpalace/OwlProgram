@@ -19,8 +19,11 @@ public:
   /** set square wave pulse width: 0.0 to 1.0 for 0% to 100% */
   void setPulseWidth(float value);
   float getNextSample();
-  void getSamples(FloatArray samples);
-  void getSamples(FloatArray samples, FloatArray frequency);
+  /* put a block of output samples into @param output */
+  void getSamples(FloatArray output);
+  /* put a block of output samples into @param samples, 
+     with frequency determined by samples in @param frequency */
+  void getSamples(FloatArray output, FloatArray frequency);
 };
 
 #endif /* __PolyBlepOscillator_h__ */
