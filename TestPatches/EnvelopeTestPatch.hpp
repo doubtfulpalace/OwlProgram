@@ -37,10 +37,13 @@ class EnvelopeTestPatch : public Patch {
 public:
   static const unsigned int numEnvs = 2;
   AdsrEnvelope env[numEnvs];
+  MultipointEnvelope *mp;
   FloatArray envBuffer;
   SineOscillator osc;
-  EnvelopeTestPatch()
+  EnvelopeTestPatch() 
   {
+	int numPoints = 3;
+	mp = MultipointEnvelope::create(numPoints);
     registerParameter(PARAMETER_A, "Attack");
     registerParameter(PARAMETER_B, "Decay");
     registerParameter(PARAMETER_C, "Sustain");
@@ -51,14 +54,22 @@ public:
   }
   ~EnvelopeTestPatch(){
     FloatArray::destroy(envBuffer);
+	MultipointEnvelope::destroy(mp);
   }
   void processAudio(AudioBuffer &buffer){
+	float attack = getParameterValue(PARAMETER_A)*4;
+	float decay = getParameterValue(PARAMETER_B)*4;
+	float sustain = getParameterValue(PARAMETER_C);
+	float release = getParameterValue(PARAMETER_D)*4;
     for(int n = 0; n < numEnvs; ++n){
-      env[n].setAttack(getParameterValue(PARAMETER_A)*4);
-      env[n].setDecay(getParameterValue(PARAMETER_B)*4);
-      env[n].setSustain(getParameterValue(PARAMETER_C));
-      env[n].setRelease(getParameterValue(PARAMETER_D)*4);
+      env[n].setAttack(attack);
+      env[n].setDecay(decay);
+      env[n].setSustain(sustain);
+      env[n].setRelease(release);
     }
+	mp->setPoint(0, attack, 1);
+	mp->setPoint(1, decay, sustain);
+	mp->setPoint(2, release, 0);
 
     FloatArray fa = buffer.getSamples(0);
     FloatArray fb = buffer.getSamples(1);
@@ -74,22 +85,30 @@ public:
     for(int n = 0; n < numEnvs; ++n){
       env[n].gate(gate);
     }
+//	mp->gate(gate);
+	
     
     // use next 7 lines to test trigger
-    //  env.setRetrigger(false);
-    //  bool trigger = (lastButton != button);
-    //  static int count = 0;
-    //  if(trigger){
-      //  env.trigger();
-    //  }
-    //  lastButton = button;
+    bool trigger = (lastButton != button);
+    if(trigger){
+	  for(unsigned int n = 0; n < numEnvs; ++n){
+        env[n].setRetrigger(false);
+        env[n].trigger();
+	  }
+	  mp->setRetrigger(false);
+	  mp->trigger();
+    }
+    lastButton = button;
     
-    // env[0] is at sampling rate 
+    //env[0] is at sampling rate 
+
     osc.setFrequency(300);
-    fa.noise();
     osc.getSamples(fa);
     fb.copyFrom(fa);
-    env[0].getEnvelope(envBuffer);
+    //env[0].getEnvelope(envBuffer);
+
+	fa.noise();
+	mp->getSamples(envBuffer);
     fa.multiply(envBuffer);
     
     // env[1] is at block rate, note the zipper noise ! 

@@ -65,4 +65,66 @@ private:
   unsigned int timeBase;
 };
 
+class EnvelopeStage{
+private:
+  float value;
+  float rate;
+  float increment;
+public:
+  void setRate(float value);
+  void setLevel(float value);
+  void trigger();
+  void getNextSample();
+  void setTimeBase(unsigned int timeBase);
+};
+
+class MultipointEnvelope : public Envelope {
+private:
+  enum EnvelopeTrigger { kGate, kTrigger };
+  unsigned int numStages;
+  float* states;
+  float currentLevel;
+  int currentPoint;
+  float samplePeriod;
+  float getLevel(unsigned int point);
+  float getIncrement(unsigned int point);
+  float getSustainLevel();
+  unsigned int sustainPoint;
+  bool checkPointReached();
+  EnvelopeTrigger trig;
+  int gateTime;
+  bool newGateState;
+  bool gateState;
+  bool retrigger;
+  void updateCurrentLevel();
+  unsigned int getSustainPoint();
+public:
+  MultipointEnvelope(float* data, unsigned int numStages);
+  MultipointEnvelope(float* data, unsigned int numStages, unsigned int timeBase);
+  static MultipointEnvelope* create(unsigned int points);
+  static void destroy(MultipointEnvelope* pointer);
+
+  void setRate(unsigned int point, float seconds);
+  void setLevel(unsigned int point, float level);
+  void setPoint(unsigned int point, float seconds, float level);
+  void setSustainPoint(unsigned int point);
+
+  /**
+   * Sets the timebase for the envelope.
+   *
+   * After a call to setTimeBase(), all rates have to be reset.
+   */
+  void setTimeBase(unsigned int newTimeBase);
+
+  void getSamples(FloatArray array);
+  float getNextSample();
+
+  void trigger();
+  void trigger(bool state);
+  void trigger(bool state, int triggerDelay);
+  void setRetrigger(bool on);
+  void gate(bool state);
+  void gate(bool state, int gateDelay);
+  void setLevel(float newLevel);
+};
 #endif /* ENVELOPE_HPP */
