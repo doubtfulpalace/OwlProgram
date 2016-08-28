@@ -1,6 +1,7 @@
 #ifndef OSCILLATOR_HPP
 #define OSCILLATOR_HPP
 
+#include "Patch.h"
 #include "FloatArray.h"
 
 class Oscillator {
@@ -20,6 +21,10 @@ public:
   }
   virtual void setSampleRate(float value){}
   virtual void setFrequency(float value){}
+  virtual void setTimeBase(unsigned int samples){}
+  virtual void setPeriod(float seconds){
+    setFrequency( min(Patch::getSampleRate(), 1/seconds));
+  }
   virtual void reset(){}
 };
 

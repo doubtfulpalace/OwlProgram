@@ -86,6 +86,8 @@ public:
   static const float LOG;
   static const uint16_t ON;
   static const uint16_t OFF;
+  static int getBlockSize();
+  static float getSampleRate();
   /* Get a float or int parameter with optional smoothing, hysteresis and exponentiation.
    * The parameter value will be scaled to the range given by min and max.
    * Lambda specifies smoothing factor 0 to 1.0, or 0.0 for no smoothing (default).
@@ -102,8 +104,6 @@ public:
   /** @deprecated */
   int getSamplesSinceButtonPressed(PatchButtonId bid);
   void setButton(PatchButtonId bid, uint16_t value, uint16_t samples=0);
-  int getBlockSize();
-  float getSampleRate();
   AudioBuffer* createMemoryBuffer(int channels, int samples);
   float getElapsedBlockTime();
   int getElapsedCycles();
@@ -111,6 +111,15 @@ public:
   virtual void buttonChanged(PatchButtonId bid, uint16_t value, uint16_t samples){}
   /* virtual void parameterChanged(PatchParameterId pid, float value, int samples){} */
   virtual void processAudio(AudioBuffer& output) = 0;
+};
+
+class Frequency {
+  static float normal(float _hz){
+    return _hz * 2 / Patch::getSampleRate();
+  }
+  static float hz(float _normal){
+    return _normal * (Patch::getSampleRate() / 2);
+  }
 };
 
 #endif // __Patch_h__
