@@ -30,7 +30,7 @@
 #define __EnvelopeTestPatch_hpp__
 
 #include "StompBox.h"
-#include "Envelope.hpp"
+#include "Envelope.h"
 
 class EnvelopeTestPatch : public Patch {
 public:
@@ -65,16 +65,17 @@ public:
       button = RED_BUTTON;
     
     // use next two lines to test gate. Gate will be on as long as the red light is on
-    //  bool gate = (button == RED_BUTTON);
-    //  env.gate(gate);
+    bool gate = (button == RED_BUTTON);
+    env.gate(gate);
     
-    // use next 6 lines to test trigger
-    bool trigger = (lastButton != button);
-    static int count = 0;
-    if(trigger){
-      env.trigger();
-    }
-    lastButton = button;
+    // use next 7 lines to test trigger
+    //  env.setRetrigger(false);
+    //  bool trigger = (lastButton != button);
+    //  static int count = 0;
+    //  if(trigger){
+      //  env.trigger();
+    //  }
+    //  lastButton = button;
     
     env.getEnvelope(envBuffer);
     fa.multiply(envBuffer);

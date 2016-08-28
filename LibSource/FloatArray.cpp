@@ -12,7 +12,7 @@
 void FloatArray::getMin(float* value, int* index){
 /// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
 #ifdef ARM_CORTEX
-  unsigned long idx;
+  uint32_t idx;
   arm_min_f32(data, size, value, &idx);
   *index = (int)idx;
 #else
@@ -48,7 +48,7 @@ void FloatArray::getMax(float* value, int* index){
   ASSERT(size>0, "Wrong size");
 /// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
 #ifdef ARM_CORTEX 
-  unsigned long idx;
+  uint32_t idx;
   arm_max_f32(data, size, value, &idx);
   *index = (int)idx;
 #else
@@ -81,11 +81,11 @@ int FloatArray::getMaxIndex(){
 }
 
 void FloatArray::rectify(FloatArray& destination){ //this is actually "copy data with rectifify"
-  int minSize= min(size,destination.getSize()); //TODO: shall we take this out and allow it to segfault?
 /// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
 #ifdef ARM_CORTEX   
   arm_abs_f32(data, destination.getData(), size);
 #else
+  int minSize= min(size,destination.getSize()); //TODO: shall we take this out and allow it to segfault?
   for(int n=0; n<minSize; n++){
     destination[n] = fabs(data[n]);
   }
@@ -197,24 +197,11 @@ float FloatArray::getVariance(){
 #endif
   return result;
 }
-void FloatArray::scale(float factor, FloatArray destination){//supports in-place
-/// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
-#ifdef ARM_CORTEX  
-  arm_scale_f32(data, factor, destination, size);
-#else
-  for(int n=0; n<size; n++){
-    destination[n]=factor*data[n];
-  }
-#endif
-}
 
-void FloatArray::scale(float factor){
-/// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
-  scale(factor, *this);
-}
 void FloatArray::clip(){
   clip(1);
 }
+
 void FloatArray::clip(float max){
   for(int n=0; n<size; n++){
     if(data[n]>max)
@@ -299,7 +286,7 @@ void FloatArray::setAll(float value){
 }
 
 void FloatArray::add(FloatArray operand2, FloatArray destination){ //allows in-place
-  ASSERT(operand2.size == size &&  destination.size==size, "Arrays must be same size");
+  ASSERT(operand2.size >= size &&  destination.size<=size, "Arrays must be matching size");
 /// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
 #ifdef ARM_CORTEX
   /* despite not explicitely documented in the CMSIS documentation,
@@ -326,7 +313,7 @@ void FloatArray::add(float scalar){
 }
 
 void FloatArray::subtract(FloatArray operand2, FloatArray destination){ //allows in-place
-  ASSERT(operand2.size == size && destination.size==size, "Arrays must be same size");
+  ASSERT(operand2.size == size && destination.size >= size, "Arrays size mismatch");
   /// @note When built for ARM Cortex-M processor series, this method uses the optimized <a href="http://www.keil.com/pack/doc/CMSIS/General/html/index.html">CMSIS library</a>
 #ifdef ARM_CORTEX
   /* despite not explicitely documented in the CMSIS documentation,
@@ -375,9 +362,21 @@ void FloatArray::multiply(FloatArray operand2){ //in-place
 }
 
 void FloatArray::multiply(float scalar){
-  for(int n=0; n<size; n++){
-   data[n]*=scalar;
-  } 
+#ifdef ARM_CORTEX
+  arm_scale_f32(data, scalar, data, size);
+#else
+  for(int n=0; n<size; n++)
+    data[n]*=scalar;
+#endif
+}
+
+void FloatArray::multiply(float scalar, FloatArray destination){
+#ifdef ARM_CORTEX
+  arm_scale_f32(data, scalar, destination, size);
+#else
+  for(int n=0; n<size; n++)
+    destination[n] = data[n] * scalar;
+#endif
 }
 
 void FloatArray::negate(FloatArray& destination){//allows in-place
@@ -398,13 +397,14 @@ void FloatArray::negate(){
 void FloatArray::noise(){
   noise(-1, 1);
 }
+
 void FloatArray::noise(float min, float max){
   float amplitude = fabs(max-min);
   float offset = min;
   ASSERT(getSize()>10, "10<getSize");
   ASSERT(size==getSize(), "getSize");
   for(int n=0; n<size; n++){
-    data[n]=(rand()/(float)RAND_MAX) * amplitude + offset;
+    data[n]=(rand()/(RAND_MAX+1.0f)) * amplitude + offset;
   }
 }
 

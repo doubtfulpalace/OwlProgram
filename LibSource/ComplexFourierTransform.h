@@ -1,7 +1,9 @@
 #ifndef __ComplexFourierTransform_h__
 #define __ComplexFourierTransform_h__
-#ifdef ARM_CORTEX
 
+#include "ComplexFloatArray.h"
+
+#ifdef ARM_CORTEX
 #include "arm_const_structs.h"
 
 class ComplexFourierTransform {
@@ -16,46 +18,13 @@ public:
     ASSERT(len==32 || len ==64 || len==128 || len==256 || len==512 || len==1024 || len==2048 || len==4096, "Unsupported FFT size");
     void* args[] = {(void*)&instance, (void*)&len};
     getProgramVector()->serviceCall(OWL_SERVICE_ARM_CFFT_INIT_F32, args, 2);
-    /* switch (len) { //this block is taken from http://www.keil.com/pack/doc/cmsis/DSP/html/group___complex_f_f_t.html */
-    /*   case 16: */
-    /*     instance = arm_cfft_sR_f32_len16; */
-    /*     break; */
-    /*   case 32: */
-    /*     instance = arm_cfft_sR_f32_len32; */
-    /*     break; */
-    /*   case 64: */
-    /*     instance = arm_cfft_sR_f32_len64; */
-    /*     break; */
-    /*   case 128: */
-    /*     instance = arm_cfft_sR_f32_len128; */
-    /*     break; */
-    /*   case 256: */
-    /*     instance = arm_cfft_sR_f32_len256; */
-    /*     break; */
-    /*   case 512: */
-    /*     instance = arm_cfft_sR_f32_len512; */
-    /*     break; */
-    /*   /\* */
-    /*   case 1024: */
-    /*     instance = arm_cfft_sR_f32_len1024; */
-    /*     break; */
-    /*   case 2048: */
-    /*     instance = arm_cfft_sR_f32_len2048; */
-    /*     break; */
-    /*   case 4096: */
-    /*     instance = &arm_cfft_sR_f32_len4096; */
-    /*     break; */
-    /*   *\/ */
-    /* default: */
-    /*   ASSERT(0, "Unsupported FFT size"); */
-    /* } */
     // Supported FFT Lengths are 32, 64, 128, 256, 512, 1024, 2048, 4096.
   }
-  void fft(ComplexFloatArray& inout){
+  void fft(ComplexFloatArray inout){
     ASSERT(inout.getSize() >= getSize(), "Input array too small");
     arm_cfft_f32(&instance, (float*)inout, 0, 1); //forward
   }
-  void ifft(ComplexFloatArray& inout){
+  void ifft(ComplexFloatArray inout){
     ASSERT(inout.getSize() >= getSize(), "Input array too small");
    arm_cfft_f32(&instance, (float*)inout, 1, 1); //inverse
   }
@@ -72,37 +41,33 @@ private:
   kiss_fft_cfg cfgfft;
   kiss_fft_cfg cfgifft;
   ComplexFloatArray temp;
-  ComplexFloat *data;
-  int size;
 public:
-  ComplexFourierTransform() : data(NULL), size(0){}
+  ComplexFourierTransform(){}
   ComplexFourierTransform(int len){
     init(len);
   }
   ~ComplexFourierTransform(){
-    free(data);
+    ComplexFloatArray::destroy(temp);
   }
   void init(int len){
     ASSERT(len==32 || len ==64 || len==128 || len==256 || len==512 || len==1024 || len==2048 || len==4096, "Unsupported FFT size");
     cfgfft = kiss_fft_alloc(len, 0 , 0, 0);
     cfgifft = kiss_fft_alloc(len, 1,0, 0);
-    size=len;
-    data=(ComplexFloat *)malloc(sizeof(ComplexFloat)*getSize());
-    temp=ComplexFloatArray(data, getSize());
+    temp = ComplexFloatArray::create(getSize());
   }
-  void fft(ComplexFloatArray& inout){
+  void fft(ComplexFloatArray inout){
     ASSERT(inout.getSize() >= getSize(), "Input array too small");
     kiss_fft(cfgfft, (kiss_fft_cpx*)(float*)inout.getData(), (kiss_fft_cpx*)(float*)temp.getData());
     inout.copyFrom(temp);
   }
-  void ifft(ComplexFloatArray& inout){
+  void ifft(ComplexFloatArray inout){
     ASSERT(inout.getSize() >= getSize(), "Input array too small");
     kiss_fft(cfgifft, (kiss_fft_cpx*)(float*)inout, (kiss_fft_cpx*)(float*)temp.getData());
     temp.scale(1.0f/getSize());
     inout.copyFrom(temp);
   }
   int getSize(){
-    return size;
+    return temp.getSize();
   }
 };
 #endif /* ifndef ARM_CORTEX */

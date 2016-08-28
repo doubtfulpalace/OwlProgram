@@ -120,7 +120,7 @@ public:
   void negate(FloatArray& destination);
   
   /**
-   * Copy and negate the array.
+   * Negate the array.
    * Sets each element in the array to its opposite.
   */
   void negate(); 
@@ -147,7 +147,7 @@ public:
   
   /**
    * Mean of the array.
-   * Gets the mean of the values in the array.
+   * Gets the mean (or average) of the values in the array.
   */
   float getMean();
   
@@ -168,21 +168,7 @@ public:
    * Gets the variance of the values in the array.
   */
   float getVariance();
-  
-  /**
-   * Array by scalar multiplication.
-   * Array by scalar multiplication, same as multiply(float).
-   * @param[out] destination the destination array
-   * @param[in] factor the scaling factor
-  */
-  void scale(float factor, FloatArray destination);
-  
-  /**
-   * Array by scalar multiplication, in-place.
-   * @param[in] factor the scaling factor
-  */
-  void scale(float factor);
-  
+
   /**
    * Clips the elements in the array in the range [-1, 1].
   */
@@ -264,11 +250,19 @@ public:
   /**
    * Array-scalar multiplication.
    * Multiplies the values in the array by **scalar**.
-   * @param scalar to be subtracted from the array
+   * @param scalar to be multiplied with the array elements
   */
   void multiply(float scalar);
   
   /**
+   * Array-scalar multiplication.
+   * Multiplies the values in the array by **scalar**.
+   * @param scalar to be subtracted from the array
+   * @param destination the destination array
+  */
+  void multiply(float scalar, FloatArray destination);
+
+/**
    * Convolution between arrays.
    * Sets **destination** to the result of the convolution between the array and **operand2**
    * @param[in] operand2 the second operand for the convolution

@@ -8,7 +8,7 @@ static char buffer[64];
 
 const char hexnumerals[] = "0123456789abcdef";
 
-char* itoa(int val, int base){
+static char* itoa(int val, int base){
   static char buf[13] = {0};
   int i = 11;
   unsigned int part = abs(val);
@@ -21,7 +21,7 @@ char* itoa(int val, int base){
   return &buf[i+1];
 }
 
-char* ftoa(float val, int base){
+static char* ftoa(float val, int base){
   static char buf[16] = {0};
   int i = 14;
   // print 4 decimal points
@@ -104,6 +104,16 @@ void debugMessage(const char* msg, float a, float b, float c){
   p = stpcpy(p, (const char*)" ");
   p = stpcpy(p, ftoa(c, 10));
   getProgramVector()->message = buffer;
+}
+
+void error(int8_t code, const char* reason){
+  ProgramVector* vec = getProgramVector();
+  if(vec != NULL){
+    vec->error = code;
+    vec->message = (char*)reason;
+    if(vec->programStatus != NULL)
+      vec->programStatus(AUDIO_ERROR_STATUS);
+  }
 }
 
 void assert_failed(const char* msg, const char* location, int line){

@@ -17,19 +17,22 @@ navigator.getUserMedia = navigator.getUserMedia ||
 	navigator.mozGetUserMedia ||
 	navigator.msGetUserMedia;
 
-var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
-var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
-var WEB_setParameter = Module.cwrap('WEB_setParameter', 'number', ['number', 'number']);
-var WEB_getPatchName = Module.cwrap('WEB_getPatchName', 'string', []);
-var WEB_getParameterName = Module.cwrap('WEB_getParameterName', 'string', ['number']);
-var WEB_getMessage = Module.cwrap('WEB_getMessage', 'string', []);
-var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
-
 owl.dsp = function () {
+
+    var WEB_setup = Module.cwrap('WEB_setup', 'number', ['number', 'number']);
+    var WEB_processBlock = Module.cwrap('WEB_processBlock', 'number', ['number', 'number']);
+    var WEB_setParameter = Module.cwrap('WEB_setParameter', 'number', ['number', 'number']);
+    var WEB_getPatchName = Module.cwrap('WEB_getPatchName', 'string', []);
+    var WEB_getParameterName = Module.cwrap('WEB_getParameterName', 'string', ['number']);
+    var WEB_getMessage = Module.cwrap('WEB_getMessage', 'string', []);
+    var WEB_getStatus = Module.cwrap('WEB_getStatus', 'string', []);
+    var WEB_setButtons = Module.cwrap('WEB_setButtons', 'number', ['number']);
+    var WEB_getButtons = Module.cwrap('WEB_getButtons', 'number', []);
+
 	var that = {};
 	that.model = {
 		inputNode: null,
-		fileNode: owl.context.createMediaElementSource(document.getElementById('file-input-audio')),
+		fileNode: owl.context.createMediaElementSource(document.getElementById('patch-test-audio')),
 		micNode: null
 	};
 	that.vectorsize = 2048;      
@@ -114,7 +117,7 @@ owl.dsp = function () {
 
 	that.onFileSelect = function (files) {
 		var fileUrl = files[0] ? URL.createObjectURL(files[0]) : '';
-		var audioElement = document.getElementById('file-input-audio');
+		var audioElement = document.getElementById('patch-test-audio');
 		audioElement.src = fileUrl;
 	}
 
@@ -129,9 +132,26 @@ owl.dsp = function () {
 
 	that.update = function (key, val) {
 		WEB_setParameter(key, val);
-		console.log("set parameter "+key+": "+val);
 		return that;
 	};
+    
+        that.setButtons = function(values) {
+		WEB_setButtons(values);
+		return that;
+        };
+
+        that.getButtons = function() {
+    	        return WEB_getButtons();
+        };
+
+        that.toggleButton = function() {
+	        var values = WEB_getButtons();
+	        values ^= 0x02; // PUSHBUTTON;
+	        values ^= 0x04; // GREEN_BUTTON;
+	        values ^= 0x08; // RED_BUTTON;
+        	WEB_setButtons(values);
+		return that;
+        };
 
 	that.init = function () {
 		var i;
