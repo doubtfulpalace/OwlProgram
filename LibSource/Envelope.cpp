@@ -216,8 +216,6 @@ void MultipointEnvelope::getSamples(FloatArray output){
   for(int n = 0; n < output.getSize(); ++n){
     output[n] = getNextSample();
   }
-  debugMessage("state:", currentLevel, currentPoint);
-  debugMessage("increments:", 1000*getIncrement(0), 1000*getIncrement(1), 1000*getIncrement(2));
 }
 
 float MultipointEnvelope::getNextSample(){
@@ -244,7 +242,7 @@ float MultipointEnvelope::getNextSample(){
       ++currentPoint;
       if(currentPoint == numStages){ // idle
         currentLevel = 0;
-        if(retrigger == true){
+        if(retrigger == true && trig == kTrigger){
           currentPoint = 0; // restart! 
         }
       }
