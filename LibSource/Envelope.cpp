@@ -191,11 +191,7 @@ void MultipointEnvelope::setRate(unsigned int point, float seconds){
   float start = point == 0 ? 0 : getLevel(point - 1);
   float stop = getLevel(point);
   float diff = stop - start; // this is negative when decreasing
-  float increment;
-  if(diff > 0)
-    increment = samplePeriod / seconds;
-  else
-    increment = -samplePeriod / seconds;
+  float increment = samplePeriod / seconds * diff;
   states[point * 2] = increment;
 }
 
@@ -212,8 +208,8 @@ float MultipointEnvelope::getLevel(unsigned int point){
 }
 
 void MultipointEnvelope::setPoint(unsigned int point, float seconds, float level){
-  setRate(point, seconds);
   setLevel(point, level);
+  setRate(point, seconds);
 }
 
 void MultipointEnvelope::getSamples(FloatArray output){

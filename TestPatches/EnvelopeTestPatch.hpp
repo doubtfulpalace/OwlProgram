@@ -85,29 +85,27 @@ public:
     for(int n = 0; n < numEnvs; ++n){
       env[n].gate(gate);
     }
-//	mp->gate(gate);
+	mp->gate(gate);
 	
     
-    // use next 7 lines to test trigger
-    bool trigger = (lastButton != button);
-    if(trigger){
-	  for(unsigned int n = 0; n < numEnvs; ++n){
-        env[n].setRetrigger(false);
-        env[n].trigger();
-	  }
-	  mp->setRetrigger(false);
-	  mp->trigger();
-    }
-    lastButton = button;
+    // use next 10 lines to test trigger
+    //bool trigger = (lastButton != button);
+    //if(trigger){
+	//  for(unsigned int n = 0; n < numEnvs; ++n){
+    //    env[n].setRetrigger(false);
+    //    env[n].trigger();
+	//  }
+	//  mp->setRetrigger(false);
+	//  mp->trigger();
+    //}
+    //lastButton = button;
     
-    //env[0] is at sampling rate 
-
-    osc.setFrequency(300);
+    osc.setFrequency(500);
     osc.getSamples(fa);
     fb.copyFrom(fa);
+    //env[0] is at sampling rate 
     //env[0].getEnvelope(envBuffer);
 
-	fa.noise();
 	mp->getSamples(envBuffer);
     fa.multiply(envBuffer);
     
