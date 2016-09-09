@@ -4,6 +4,7 @@
 #include "Patch.h"
 #include "basicmaths.h"
 #include "Heavy_owl.h"
+#include <alloca.h>
 
 #define HV_OWL_PARAM_A "Channel-A"
 #define HV_OWL_PARAM_B "Channel-B"
@@ -54,7 +55,6 @@ extern "C" {
 class HeavyPatch : public Patch {
 private:
   unsigned int receiverHash[9];
-  HvMessage* notein;
 public:
   HeavyPatch() {
     registerParameter(PARAMETER_E, HV_OWL_PARAM_A);
@@ -76,20 +76,10 @@ public:
 				      HEAVY_MESSAGE_QUEUE_SIZE);
     hv_setPrintHook(context, &printHook);
     hv_setSendHook(context, sendHook);
-
-    // create note in message
-    notein = (HvMessage*)malloc(hv_msg_getByteSize(5));
-    hv_msg_init(notein, 5, 0.0);
-    hv_msg_setFloat(notein, 0, 60.0); // note
-    hv_msg_setFloat(notein, 1, 80.0); // velocity
-    hv_msg_setFloat(notein, 2, 1.0f); // channel
-    hv_msg_setFloat(notein, 3, 0x90); // command
-    hv_msg_setFloat(notein, 4, 0.0f); // port
   }
   
   ~HeavyPatch() {
     hv_owl_free(context);
-    free(notein);
   }
   
   void buttonChanged(PatchButtonId bid, uint16_t value, uint16_t samples){
@@ -97,16 +87,20 @@ public:
       hv_sendFloatToReceiver(context, receiverHash[8], value ? 1.0 : 0.0);
     }else if(bid >= MIDI_NOTE_BUTTON){
       // send message to notein object
-      unsigned int hash = 0x67E37CA3; // __hv_notein
+      static const unsigned int hash = 0x67E37CA3; // __hv_notein
       float note = (float)(bid - MIDI_NOTE_BUTTON);
       float velocity = (float)(value>>5);
-      // unsigned int hash = 0x41BE0F9C; // __hv_ctlin
       float ms = 1000.0f*(samples+getBlockSize())/getSampleRate(); // delay in milliseconds
-      // float cmd = value ? 0x90 : 0x80;
+      // create note in message
+      HvMessage* notein;
+      notein = (HvMessage*)alloca(hv_msg_getByteSize(5));
+      hv_msg_init(notein, 5, 0.0);
+      // notein expects: note, velocity, channel, command, port
       hv_msg_setFloat(notein, 0, note);
       hv_msg_setFloat(notein, 1, velocity);
-      // notein expects: note, velocity, channel, command, port
-      // not thread safe
+      hv_msg_setFloat(notein, 2, 1.0f); // channel
+      hv_msg_setFloat(notein, 3, value ? 0x90 : 0x80); // command
+      hv_msg_setFloat(notein, 4, 0.0f); // port
       hv_scheduleMessageForReceiver(context, hash, ms, notein);
     }
   }
