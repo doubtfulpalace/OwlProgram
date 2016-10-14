@@ -1,7 +1,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include "ProgramVector.h"
-#include "StompBox.h"
+#include "Patch.h"
 #include "device.h"
 #include "main.h"
 #include "message.h"
@@ -51,7 +51,7 @@ unsigned long systicks(){
   return clock();
 }
 
-#define NOF_PARAMETERS 16
+#define NOF_PARAMETERS 40
 static int blocksize;
 static char* patchName = NULL;
 static int16_t parameters[NOF_PARAMETERS];

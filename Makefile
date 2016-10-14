@@ -30,6 +30,16 @@ PATCHNAME   ?= $(HEAVY)
 PATCHCLASS  ?= HeavyPatch
 PATCHFILE   ?= HeavyPatch.hpp
 DEPS        += heavy
+else ifdef GEN
+# options for Max/MSP Gen compilation
+PATCHNAME   ?= $(GEN)
+PATCHCLASS  ?= GenPatch
+PATCHFILE   ?= GenPatch.hpp
+DEPS        += gen
+else ifdef TEST
+PATCHNAME   ?= $(TEST)
+PATCHCLASS  ?= $(PATCHNAME)Patch
+PATCHFILE   ?= $(PATCHNAME)Patch.hpp
 else
 # options for C++ compilation
 PATCHNAME   ?= "Template"
@@ -52,7 +62,7 @@ export PATCHFILE PATCHIN PATCHOUT
 export HEAVYTOKEN HEAVY
 export LDSCRIPT CPPFLAGS EMCCFLAGS ASFLAGS
 
-DEPS += $(BUILD)/patch.cpp $(BUILD)/patch.h $(BUILD)/Source/startup.s 
+DEPS += $(BUILD)/registerpatch.cpp $(BUILD)/registerpatch.h $(BUILD)/Source/startup.s 
 
 all: patch
 
@@ -62,10 +72,10 @@ all: patch
 	@echo Building patch $(PATCHNAME)
 	@mkdir -p $(BUILD)/Source
 
-$(BUILD)/patch.cpp: .FORCE
+$(BUILD)/registerpatch.cpp: .FORCE
 	@echo "REGISTER_PATCH($(PATCHCLASS), \"$(PATCHNAME)\", $(PATCHIN), $(PATCHOUT));" > $@
 
-$(BUILD)/patch.h: .FORCE
+$(BUILD)/registerpatch.h: .FORCE
 	@echo "#include \"$(PATCHFILE)\"" > $@
 
 $(BUILD)/Source/startup.s: .FORCE
@@ -89,6 +99,9 @@ faust: .FORCE
 
 heavy: .FORCE
 	@$(MAKE) -s -f heavy.mk heavy
+
+gen: .FORCE
+	@$(MAKE) -s -f gen.mk gen
 
 sysex: patch $(BUILD)/$(TARGET).syx ## package patch binary as MIDI sysex
 	@echo Built sysex $(PATCHNAME) in $(BUILD)/$(TARGET).syx
@@ -120,6 +133,9 @@ map: patch ## build map file (Build/patch.map)
 as: patch ## build assembly file (Build/patch.s)
 	@$(MAKE) -s -f compile.mk as
 	@echo Built $(PATCHNAME) assembly in $(BUILD)/$(TARGET).s
+
+test: $(DEPS) ## run test patch
+	@$(MAKE) -s -f test.mk test
 
 help: ## show this help
 	@echo 'Usage: make [target] ...'

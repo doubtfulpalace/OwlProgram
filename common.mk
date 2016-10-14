@@ -2,9 +2,7 @@
 DSPLIB=Libraries/CMSIS/DSP_Lib/Source
 
 # Tool path
-TOOLROOT ?= Tools/gcc-arm-none-eabi-5_3-2016q1/bin/
-# TOOLROOT ?= Tools/gcc-arm-none-eabi-5_2-2015q4/bin/
-
+TOOLROOT ?= Tools/gcc-arm-none-eabi-5_4-2016q2/bin/
 CMSIS ?= Libraries/CMSIS/Include/
 
 # Tools
@@ -26,7 +24,6 @@ ARCH_FLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # ARCH_FLAGS += -mfloat-abi=soft -msoft-float
 ARCH_FLAGS += -fsingle-precision-constant
 DEF_FLAGS = -DARM_MATH_CM4 -DSTM32F4XX -D__FPU_PRESENT -D__FPU_USED=1
-# DEF_FLAGS = -DUSE_STDPERIPH_DRIVER -DARM_MATH_CM4 -DSTM32F4XX
 INC_FLAGS = -I$(BUILDROOT)/Libraries -I$(DEVICE) -I$(CMSIS) -I$(PERIPH_FILE)/inc -I$(SOURCE)
 INC_FLAGS += -I$(DEVICE)/Include -I$(CMSIS)
 INC_FLAGS += -I$(USB_DEVICE_FILE)/Core/inc -I$(USB_DEVICE_FILE)/Class/cdc/inc

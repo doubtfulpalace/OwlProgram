@@ -1,6 +1,6 @@
 #include "ProgramVector.h"
 #include "ServiceCall.h"
-#include "SampleBuffer.hpp"
+#include "ShortBuffer.hpp"
 #include "PatchProcessor.h"
 #include "message.h"
 #include "Patch.h"
@@ -50,7 +50,7 @@ void registerPatch(const char* name, uint8_t inputs, uint8_t outputs, Patch* pat
   processor.setPatch(patch);
 }
 
-SampleBuffer* samples;
+ShortBuffer* samples;
 void setup(ProgramVector* pv){
 #ifdef DEBUG_MEM
 #ifdef ARM_CORTEX
@@ -67,7 +67,7 @@ void setup(ProgramVector* pv){
 #endif
 #endif
   // samples = new SampleBuffer(getBlockSize());
-  samples = new SampleBuffer();
+  samples = new ShortBuffer();
 }
 
 void processBlock(ProgramVector* pv){

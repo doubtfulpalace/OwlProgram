@@ -8,6 +8,7 @@ static char buffer[64];
 
 const char hexnumerals[] = "0123456789abcdef";
 
+// itoa and ftoa are used by HvMessage.c and web.cpp
 char* msg_itoa(int val, int base){
   static char buf[13] = {0};
   int i = 11;
