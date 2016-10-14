@@ -18,8 +18,8 @@
 #include "message.h"
 #include <string.h>
 
-char* itoa(int val, int base);
-char* ftoa(float val, int base);
+char* msg_itoa(int val, int base);
+char* msg_ftoa(float val, int base);
 
 HvMessage *msg_init(HvMessage *m, hv_size_t numElements, hv_uint32_t timestamp) {
   m->timestamp = timestamp;
@@ -208,9 +208,9 @@ char *msg_toString(const HvMessage *m) {
     // length of our string is each atom plus a space, or \0 on the end
     switch (msg_getType(m, i)) {
       case HV_MSG_BANG: len[i] = 5; break;
-      case HV_MSG_FLOAT: len[i] = strnlen(ftoa(msg_getFloat(m, i), 10), 16)+1; break;
+      case HV_MSG_FLOAT: len[i] = strnlen(msg_ftoa(msg_getFloat(m, i), 10), 16)+1; break;
       case HV_MSG_SYMBOL: len[i] = strnlen(msg_getSymbol(m, i), 16)+1; break;
-      case HV_MSG_HASH: len[i] = strnlen(itoa(msg_getHash(m, i), 16), 8)+3; break;
+      case HV_MSG_HASH: len[i] = strnlen(msg_itoa(msg_getHash(m, i), 16), 8)+3; break;
       default: break;
     }
     size += len[i];
@@ -230,7 +230,7 @@ char *msg_toString(const HvMessage *m) {
 	dst = stpcpy(dst, "bang");
 	break;
       case HV_MSG_FLOAT: 
-	ptr = ftoa(msg_getFloat(m, i), 10); 
+	ptr = msg_ftoa(msg_getFloat(m, i), 10); 
 	dst = stpcpy(dst, ptr);
 	break;	
       case HV_MSG_SYMBOL: 
@@ -238,7 +238,7 @@ char *msg_toString(const HvMessage *m) {
 	dst = stpcpy(dst, ptr);
 	break;
       case HV_MSG_HASH:
-	ptr = itoa(msg_getHash(m, i), 16);
+	ptr = msg_itoa(msg_getHash(m, i), 16);
 	dst = stpcpy(dst, "0x");
 	dst = stpcpy(dst, ptr);
 	break;
