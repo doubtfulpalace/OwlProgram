@@ -21,14 +21,21 @@ public:
 	}
 
 	~DbapSource(){};
+
 	void setSpread(float newSpread){
 		rSquared = newSpread * newSpread;
 	}
+
 	void setPosition(float newX, float newY){
 		xs = newX;
 		ys = newY;
 	}
-	void setPositionPolar(float newAngle, float newR);
+
+	void setPositionPolar(float angle, float r){
+		xs = r * cosf(angle);
+		ys = r * sinf(angle);
+	}
+
 	void getAmplitudes(FloatArray& outputs, FloatArray speakersX, FloatArray speakersY){
 		// Assumes all the FloatArrays have the same size.
 		float sum = 0;
