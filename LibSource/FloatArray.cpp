@@ -1,7 +1,12 @@
 #include "FloatArray.h"
-#include "basicmaths.h"
-#include "message.h"
+//#include "basicmaths.h"
+//#include "message.h"
 #include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define ASSERT(x,y)
+#define min(x,y) fmin(x,y)
 
  FloatArray::FloatArray() :
    data(NULL), size(0) {}
