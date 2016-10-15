@@ -37,7 +37,7 @@ int main(){
 		ys = 0.99;
 		dbap.setSourcePosition(source, xs, ys);
 		dbap.getAmplitudes(source, amplitudes);
-		printf("\nFor source in %.3f, gains: %.3f\n", xs, ys);
+		printf("\nFor source in %.3f, %.3f, gains:\n", xs, ys);
 		printf("%.3f    %.3f\n\n", amplitudes[1], amplitudes[0]);
 		printf("%.3f    %.3f\n\n", amplitudes[2], amplitudes[3]);
 
