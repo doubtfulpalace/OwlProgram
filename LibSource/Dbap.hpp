@@ -32,8 +32,8 @@ public:
 	}
 
 	void setPositionPolar(float angle, float r){
-		xs = r * cosf(angle);
-		ys = r * sinf(angle);
+		xs = r * cosf(angle / 360 * 2*M_PI);
+		ys = r * sinf(angle / 360 * 2*M_PI);
 	}
 
 	void getAmplitudes(FloatArray& outputs, FloatArray speakersX, FloatArray speakersY){
@@ -70,12 +70,19 @@ private:
 
 class Dbap{
 public:
+	static Dbap* create(unsigned int sources, unsigned int speakers);
 	Dbap():
+	Dbap(0)
+	{}
+
+	Dbap(unsigned int numSources):
 	sources(NULL),
-	numSources(0),
 	speakersX(NULL, 0),
 	speakersY(NULL, 0)
-	{}
+	{
+		setNumSources(numSources);
+		homeSources();
+	}
 
 	~Dbap(){
 		dealloc();
@@ -88,7 +95,7 @@ public:
 	}
 
 	void setSpeakers(FloatArray newSpeakersX, FloatArray newSpeakersY){
-		// Argumnet check: pick the smallest of the two sizes to
+		// Argument check: pick the smallest of the two sizes to
 		// ensure they have the same size.
 		unsigned int size = speakersX.getSize() < speakersY.getSize() ? 
 			speakersX.getSize() : speakersY.getSize();
@@ -131,6 +138,12 @@ public:
 	// TODO: check that output.getSize() <= speakersX.getSize()
 		if(source < numSources){
 			sources[source].getAmplitudes(output, speakersX, speakersY);
+		}
+	}
+
+	void homeSources(){
+		for(unsigned int n = 0; n < numSources; ++n){
+			sources[n].setPosition(0, 0);
 		}
 	}
 private:
