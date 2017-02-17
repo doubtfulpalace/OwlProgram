@@ -30,13 +30,14 @@
 #define __BiquadFilterTestPatch_hpp__
 
 #include "StompBox.h"
+#include "BiquadFilter.h"
 
-class BiquadFilterTestPatch : public Patch {
+class BiquadFilterTestPatch : public TestPatch {
 public:
   BiquadFilter *filter;
   BiquadFilterTestPatch(){
-    registerParameter(PARAMETER_A, "Cutoff");
-    registerParameter(PARAMETER_B, "Resonance");
+    // registerParameter(PARAMETER_A, "Cutoff");
+    // registerParameter(PARAMETER_B, "Resonance");
     int stages=3;
     filter=BiquadFilter::create(stages);
     float cutoff=0.2;
@@ -47,11 +48,14 @@ public:
     FilterStage stage(coefficients, states);
     filter->setLowPass(cutoff, resonance);
     stage.setLowPass(cutoff, resonance);
-    for(int k=0; k<stages; k++){ 
-      for(int n=0; n<5; n++){
-        float filterC=filter->getFilterStage(k).getCoefficients()[n];
-        float stageC=stage.getCoefficients()[n];
-        ASSERT(filterC==stageC, "Coefficients not initialized"); //check that filter coefficients are properly initialized
+    {
+      TEST("Initialise coefficients");
+      for(int k=0; k<stages; k++){ 
+	for(int n=0; n<5; n++){
+	  float filterC=filter->getFilterStage(k).getCoefficients()[n];
+	  float stageC=stage.getCoefficients()[n];
+	  CHECK_EQUAL(filterC, stageC); //check that filter coefficients are properly initialized
+	}
       }
     }
     int signalLength=100;
@@ -81,23 +85,19 @@ public:
       x.copyFrom(y); //copy the output to the input for the next iteration. INEFFICIENT
     }
     //done with the filter
-    for(int n=0; n<x.getSize(); n++){
-      // ASSERT(abs(y[n]-y1[n])<0.0001, "");//BiquadFilter.process(FloatArray, FloatArray) result"); //TODO: fails for non-arm
+    {
+      TEST("Compare output");
+      for(int n=0; n<x.getSize(); n++){
+	// ASSERT(abs(y[n]-y1[n])<0.0001, "");//BiquadFilter.process(FloatArray, FloatArray) result"); //TODO: fails for non-arm
+
+	// CHECK_CLOSE(y[n], y1[n], 0.0001);
+      }
     }
     FloatArray::destroy(x);
     FloatArray::destroy(x1);
     FloatArray::destroy(y);
     FloatArray::destroy(y1);
     debugMessage("All tests passed");
-  }
-  void processAudio(AudioBuffer &buffer){
-    float cutoff=getParameterValue(PARAMETER_A);
-    float resonance=10*getParameterValue(PARAMETER_B);
-    FloatArray fa=buffer.getSamples(0);
-    // fa.noise();
-    filter->setLowPass(cutoff, resonance);
-    filter->process(fa, fa, fa.getSize());
-    buffer.getSamples(1).copyFrom(fa);
   }
 };
 
