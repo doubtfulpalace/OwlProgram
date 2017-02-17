@@ -40,65 +40,65 @@ float arm_sqrtf(float in){
   return out;
 }
 
-static char fastPowInitialized = 0;
-static FastPow fastPow;
-static void initializeFastPow(int fastPrecision){
-  fastPow.setup(fastPrecision);
-  fastPowInitialized = 1;
-}
-/* http://stackoverflow.com/questions/6475373/optimizations-for-pow-with-const-non-integer-exponent */
-/* http://www.hxa.name/articles/content/fast-pow-adjustable_hxa7241_2007.html */
-/* https://hackage.haskell.org/package/approximate-0.2.2.3/src/cbits/fast.c */
-  //  union { float d; int x; } u = { a };
-  //  u.x = (int)(b * (u.x - 1064866805) + 1064866805);
-  //  return u.d;
+// static char fastPowInitialized = 0;
+// static FastPow fastPow;
+// static void initializeFastPow(int fastPrecision){
+//   fastPow.setup(fastPrecision);
+//   fastPowInitialized = 1;
+// }
+// /* http://stackoverflow.com/questions/6475373/optimizations-for-pow-with-const-non-integer-exponent */
+// /* http://www.hxa.name/articles/content/fast-pow-adjustable_hxa7241_2007.html */
+// /* https://hackage.haskell.org/package/approximate-0.2.2.3/src/cbits/fast.c */
+//   //  union { float d; int x; } u = { a };
+//   //  u.x = (int)(b * (u.x - 1064866805) + 1064866805);
+//   //  return u.d;
 
-// New implementation, uses FastPow class
-float fastpowf(float a, float b) {
-  if(fastPowInitialized == 0){
-    initializeFastPow(FASTPOW_PRECISION);
-  }
-  return fastPow.pow(a,b);
-}
+// // New implementation, uses FastPow class
+// float fastpowf(float a, float b) {
+//   if(fastPowInitialized == 0){
+//     initializeFastPow(FASTPOW_PRECISION);
+//   }
+//   return fastPow.pow(a,b);
+// }
 
-float fastpow2f(float b){
-  if(fastPowInitialized == 0){
-    initializeFastPow(FASTPOW_PRECISION);
-  }
-  return fastPow.powIlog(1, b);
-}
+// float fastpow2f(float b){
+//   if(fastPowInitialized == 0){
+//     initializeFastPow(FASTPOW_PRECISION);
+//   }
+//   return fastPow.powIlog(1, b);
+// }
 
-float fastexpf(float b) {
-  if(fastPowInitialized == 0){
-    initializeFastPow(FASTPOW_PRECISION);
-  }
-  static float eulerIlog = fastPow.computeIlog(exp(1));
-  return fastPow.powIlog(eulerIlog, b);
-}
+// float fastexpf(float b) {
+//   if(fastPowInitialized == 0){
+//     initializeFastPow(FASTPOW_PRECISION);
+//   }
+//   static float eulerIlog = fastPow.computeIlog(exp(1));
+//   return fastPow.powIlog(eulerIlog, b);
+// }
 
-float fastlog2f(float b){
-  if(fastPowInitialized == 0){
-    initializeFastPow(FASTPOW_PRECISION); //note that here we would be initializing two tables, only to use the log.
-  }
-  static float ilog = 1/fastPow.log(2);
-  return fastPow.log(b) * ilog;
-}
+// float fastlog2f(float b){
+//   if(fastPowInitialized == 0){
+//     initializeFastPow(FASTPOW_PRECISION); //note that here we would be initializing two tables, only to use the log.
+//   }
+//   static float ilog = 1/fastPow.log(2);
+//   return fastPow.log(b) * ilog;
+// }
 
-float fastlog10f(float b){
-  // todo: test!
-  if(fastPowInitialized == 0)
-    initializeFastPow(FASTPOW_PRECISION);
-  static float ilog = 1/fastPow.log(10);
-  return fastPow.log(b) * ilog;
-}
+// float fastlog10f(float b){
+//   // todo: test!
+//   if(fastPowInitialized == 0)
+//     initializeFastPow(FASTPOW_PRECISION);
+//   static float ilog = 1/fastPow.log(10);
+//   return fastPow.log(b) * ilog;
+// }
 
-float fastlogf(float b){
-  // todo: test!
-  if(fastPowInitialized == 0)
-    initializeFastPow(FASTPOW_PRECISION);
-  static float ilog = 1/fastPow.log(M_E);
-  return fastPow.log(b) * ilog;
-}
+// float fastlogf(float b){
+//   // todo: test!
+//   if(fastPowInitialized == 0)
+//     initializeFastPow(FASTPOW_PRECISION);
+//   static float ilog = 1/fastPow.log(M_E);
+//   return fastPow.log(b) * ilog;
+// }
 
 /* Fast arctan2
  * from http://dspguru.com/dsp/tricks/fixed-point-atan2-with-self-normalization

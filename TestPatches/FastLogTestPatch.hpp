@@ -1,6 +1,6 @@
 #include "TestPatch.hpp"
 #include "FastLog.h"
-#include "IcsiLogTable.h"
+#include "../Tools/IcsiLogTable.h"
 
 class FastLogTestPatch : public TestPatch {
 public:
@@ -21,15 +21,16 @@ public:
         float perc = fabsf(err/exact) * 100;
         maxPerc = maxPerc > perc ? maxPerc : perc;
         {
-          float fastlog2result = fastlog2f(in);
+          // float fastlog2result = fastlog2f(in);
+          float fastlog2result = log2f(in);
           float fastlogresult1 = fastLog.log(in) / fastLog.log(2);
           float fastlogresult2 = fastLog.log(2, in);
           float threshold = 0.000001;
-          if(fabsf(fastlog2result - fastlogresult1)>threshold || fabsf(fastlog2result-fastlogresult2)>threshold){
-            CHECK(false);
+          // if(fabsf(fastlog2result - fastlogresult1)>threshold || fabsf(fastlog2result-fastlogresult2)>threshold){
+	  CHECK_CLOSE(fastlog2result, fastlogresult1, threshold);
             //printf("fastlog2 mismatch %d: %f %f %f\n", n, fastlog2result, fastlogresult1, fastlogresult2);
             //exit(1);
-          }
+          // }
         }
       }
     }
