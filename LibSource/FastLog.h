@@ -140,7 +140,6 @@ public:
     return this->log(arg) / this->log(base);
   }
 
-private:
   /*
    * Creates the ICSILog lookup table.
   */

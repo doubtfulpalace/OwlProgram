@@ -1,6 +1,7 @@
 #include "TestPatch.hpp"
 #include "FastPow.h"
-#include "../Tools/IcsiLogTable.h"
+#include "../Tools/FastLogTable.h"
+#include "../Tools/FastPowTables.h"
 
 class FastPowTestPatch : public TestPatch {
 public:
@@ -10,11 +11,13 @@ public:
       TEST("FastPow");
       printf("testing fastPow\n");
       FastPow fastPow;
-      FloatArray tableH = FloatArray::create(1 << FastPow::tableHLength);
-      FloatArray tableL = FloatArray::create(1 << FastPow::tableLLength);
-      FastPow::fillTableH(tableH);
-      FastPow::fillTableL(tableL);
-      FloatArray logTable = FloatArray((float*)icsi_log_table, 1 << icsi_log_precision);
+      //FloatArray tableH_ = FloatArray::create(FastPow::tableHLength);
+      //FloatArray tableL_ = FloatArray::create(FastPow::tableLLength);
+      //FastPow::fillTableH(tableH_);
+      //FastPow::fillTableL(tableL_);
+      FloatArray tableH = FloatArray((float*)fast_pow_h_table, fast_pow_h_table_size);
+      FloatArray tableL = FloatArray((float*)fast_pow_l_table, fast_pow_l_table_size);
+      FloatArray logTable = FloatArray((float*)fast_log_table, 1 << fast_log_precision);
       fastPow.setTables(tableH, tableL, logTable);
       float maxPerc = 0;
       float threshold = 0.001; // maximum relative error accepted
