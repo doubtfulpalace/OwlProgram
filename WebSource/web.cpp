@@ -20,7 +20,6 @@
 
 ProgramVector programVector;
 extern PatchProcessor* getInitialisingPatchProcessor();
-extern char* msg_itoa(int val, int base);
 
 extern "C"{
   /* ASM exported functions */

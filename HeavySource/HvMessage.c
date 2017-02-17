@@ -18,9 +18,6 @@
 #include "message.h"
 #include <string.h>
 
-char* msg_itoa(int val, int base);
-char* msg_ftoa(float val, int base);
-
 HvMessage *msg_init(HvMessage *m, hv_size_t numElements, hv_uint32_t timestamp) {
   m->timestamp = timestamp;
   m->numElements = (hv_uint16_t) numElements;
@@ -44,7 +41,7 @@ HvMessage *msg_initWithBang(HvMessage *m, hv_uint32_t timestamp) {
   return m;
 }
 
-HvMessage *msg_initWithSymbol(HvMessage *m, hv_uint32_t timestamp, char *s) {
+HvMessage *msg_initWithSymbol(HvMessage *m, hv_uint32_t timestamp, const char *s) {
   m->timestamp = timestamp;
   m->numElements = 1;
   m->numBytes = sizeof(HvMessage) + (hv_uint16_t) hv_strlen(s);
@@ -106,8 +103,8 @@ bool msg_hasFormat(const HvMessage *m, const char *fmt) {
     switch (fmt[i]) {
       case 'b': if (!msg_isBang(m, i)) return false; break;
       case 'f': if (!msg_isFloat(m, i)) return false; break;
-      case 's': if (!msg_isSymbol(m, i)) return false; break;
       case 'h': if (!msg_isHash(m, i)) return false; break;
+      case 's': if (!msg_isSymbol(m, i)) return false; break;
       default: return false;
     }
   }
@@ -160,9 +157,13 @@ hv_uint32_t msg_symbolToHash(const char *s) {
   hv_uint32_t x = len; // seed (0) ^ len
 
   while (len >= 4) {
+#if HV_EMSCRIPTEN
+    hv_uint32_t k = s[0] | (s[1] << 8) | (s[2] << 16) | (s[3] << 24);
+#else
     hv_uint32_t k = *((hv_uint32_t *) s);
+#endif
     k *= n;
-    k ^= k >> r;
+    k ^= (k >> r);
     k *= n;
     x *= n;
     x ^= k;
@@ -170,15 +171,15 @@ hv_uint32_t msg_symbolToHash(const char *s) {
   }
 
   switch (len) {
-    case 3: x ^= s[2] << 16;
-    case 2: x ^= s[1] << 8;
+    case 3: x ^= (s[2] << 16);
+    case 2: x ^= (s[1] << 8);
     case 1: x ^= s[0]; x *= n;
     default: break;
   }
 
-  x ^= x >> 13;
+  x ^= (x >> 13);
   x *= n;
-  x ^= x >> 15;
+  x ^= (x >> 15);
 
   return x;
 }
@@ -234,7 +235,7 @@ char *msg_toString(const HvMessage *m) {
 	dst = stpcpy(dst, ptr);
 	break;	
       case HV_MSG_SYMBOL: 
-	ptr = msg_getSymbol(m, i); 
+	ptr = (char*)msg_getSymbol(m, i); 
 	dst = stpcpy(dst, ptr);
 	break;
       case HV_MSG_HASH:

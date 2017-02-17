@@ -28,6 +28,7 @@ private:
 
 public:
   AdsrEnvelope(float newSampleRate);
+  virtual ~AdsrEnvelope();
   void setSampleRate(float sampleRate){
     samplePeriod = 1.0/sampleRate;
   }
@@ -45,6 +46,12 @@ public:
   float getNextSample(); // increments envelope one step
   void getEnvelope(FloatArray output); // increments envelope by output buffer length
   void attenuate(FloatArray buf); // increments envelope by buffer length
+  static AdsrEnvelope* create(float sr){
+    return new AdsrEnvelope(sr);
+  }
+  static void destroy(AdsrEnvelope* env){
+    delete env;
+  }
 private:
   static const float minTime;
   float samplePeriod;
