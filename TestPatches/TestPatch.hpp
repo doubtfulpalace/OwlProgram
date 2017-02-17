@@ -6,9 +6,9 @@
 #define TEST(name) do{ errormessage = (char*)("Test " name " failed line"); }while(0)
 #define CHECK(cond) if(!(cond)){ fail("CHECK(" #cond ") fail", __LINE__); }else{ pass(); }
 // #define CHECK_EQUAL(a, b) if((a) != (b)){ fail("CHECK_EQUAL(" #a ", " #b ") fail", __LINE__); }else{ pass(); }
-#define CHECK_CLOSE(a, b, c) if(abs((a)-(b))>(c)){ fail("CHECK_CLOSE(" #a ", " #b ", " #c ") fail", __LINE__); }else{ pass(); }
+// #define CHECK_CLOSE(a, b, c) if(abs((a)-(b))>(c)){ fail("CHECK_CLOSE(" #a ", " #b ", " #c ") fail", __LINE__); }else{ pass(); }
 #define CHECK_EQUAL(a, b) check_equal(a, b, __LINE__)
-// #define CHECK_CLOSE(a, b, c) check_close(a, b, __LINE__)
+#define CHECK_CLOSE(a, b, c) check_close(a, b, c, __LINE__)
 #define REQUIRE(cond) if(!(cond)){ assert_failed("REQUIRE(" #cond ") fail", "", __LINE__); }else{ pass(); }
 
 /** Abstract base class for tests */
@@ -36,7 +36,7 @@ public:
   }
   template<typename T>
   void check_close(T a, T b, T c, int line){
-    if(a != b){
+    if(abs(a - b) > c){
       debugMessage("CHECK_CLOSE", a, b, c);
       debugMessage(errormessage, line);
       success = false;
