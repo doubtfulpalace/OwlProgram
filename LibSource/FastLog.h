@@ -84,6 +84,11 @@ public:
 
   ~FastLog(){}
 
+  void setTable(float* table, unsigned int precision){
+    lookup_table = table;
+    n = precision;
+  }
+
   void setTable(FloatArray table){
     lookup_table = table;
     n = 0;

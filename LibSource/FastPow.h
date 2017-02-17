@@ -39,6 +39,14 @@ public:
   static constexpr int tableLExtent = 9;
   static constexpr int tableHLength = 1 << tableHExtent;
   static constexpr int tableLLength = 1 << tableLExtent;
+
+  FastPow(float* tableH, float* tableL, float* logTable, unsigned int logPrecision) :
+    tableH_m(tableH),
+    tableL_m(tableL)
+  {
+    fastLog.setTable(logTable, logPrecision);
+  }
+    
   FastPow() :
     tableH_m(NULL),
     tableL_m(NULL)
