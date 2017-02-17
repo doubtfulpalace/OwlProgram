@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     fprintf(file, "const float fast_log_table[%d] = {\n", log_table_size);
     int32_t i;
     for(i=0; i < log_table_size; ++i)
-      fprintf(file, "%.4f, ", log_lookup_table[i]);
+      fprintf(file, "%a, ", log_lookup_table[i]);
     fprintf(file, "\n};\n");
     
     FastLog fastLog(log_lookup_table, log_precision);
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
       fprintf(file, "const float fast_pow_%c_table[%d] = {\n", letter, size);
       int32_t i;
       for(i=0; i < size; ++i)
-        fprintf(file, "%.4f, ", arr[i]);
+        fprintf(file, "%a, ", arr[i]);
       fprintf(file, "\n};\n");
     }
   }
