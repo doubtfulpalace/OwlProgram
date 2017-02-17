@@ -54,6 +54,7 @@ int main(int argc, char** argv) {
     exit(1);
   }
   fprintf(file, "/* ICSI log table, precision %d, size %d */\n", precision, table_size);
+  fprintf(file, "const unsigned int icsi_log_precision = %u;\n", precision);
   fprintf(file, "const float icsi_log_table[%d] = {\n", table_size);
   int32_t i;
   for(i=0; i<table_size; ++i)

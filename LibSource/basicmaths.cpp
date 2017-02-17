@@ -1,6 +1,7 @@
 #include "basicmaths.h"
 #include <stdint.h>
-#include "FastTrans.h"
+#include "FastLog.h"
+#include "FastPow.h"
 #include "device.h"
 
 extern "C"{
