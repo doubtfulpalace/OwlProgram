@@ -82,9 +82,7 @@ public:
   	lookup_table(NULL)
   {}
 
-  ~FastLog(){
-    //free(lookup_table);
-  }
+  ~FastLog(){}
 
   void setTable(FloatArray table){
     lookup_table = table;
@@ -94,11 +92,6 @@ public:
       ++n;
   }
   
-  int getTableLength()
-  {
-    return n;
-  }
-
   /**
    * @param precision the number of bits to be taken from the mantissa.
    *   it must be (0<=precision<=23)
