@@ -14,11 +14,11 @@ private:
   */
   float* tableH_m;
   float* tableL_m;
-  unsigned int _precision;
   static constexpr float _2p23 = 8388608.0f;
   float _ilog2;
   FastLog fastLog;
 
+public:
   /**
    * Initialize powFast lookup table.
    */
@@ -35,9 +35,10 @@ private:
       zeroToOne += 1.0f / static_cast<float>(1 << precision);
     }
   }
-public:
-  static constexpr int tableHLength = 9;
-  static constexpr int tableLLength = 9;
+  static constexpr int tableHExtent = 9;
+  static constexpr int tableLExtent = 9;
+  static constexpr int tableHLength = 1 << tableHExtent;
+  static constexpr int tableLLength = 1 << tableLExtent;
   FastPow() :
     tableH_m(NULL),
     tableL_m(NULL)
@@ -48,14 +49,14 @@ public:
   static int fillTableH(FloatArray table){
     if(table.getSize() < 9)
       return -1;
-    fillTable(table,  9, tableHLength, false);
+    fillTable(table, 9, tableHExtent, false);
     return 1;
   }
 
   static int fillTableL(FloatArray table){
     if(table.getSize() < 9)
       return -1;
-    fillTable(table, 18, tableLLength, true);
+    fillTable(table, 18, tableLExtent, true);
     return 1;
   }
 
@@ -80,7 +81,7 @@ public:
     const int i = static_cast<int>( (val * (_2p23 * _ilog2)) + (127.0f * _2p23) );
 
     // replace mantissa with combined lookups
-    const float t  = tableH_m[(i >> 14) & 0x1FF] * tableL_m[(i >> 5) & 0x1FF];
+    const float t  = tableH_m[(i >> 14) & (tableHLength - 1)] * tableL_m[(i >> 5) & (tableLLength - 1)];
     const int   it = (i & 0xFF800000) |
         (*reinterpret_cast<const int*>( &t ) & 0x7FFFFF);
 
