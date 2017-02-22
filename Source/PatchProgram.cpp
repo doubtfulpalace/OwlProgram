@@ -52,6 +52,7 @@ void registerPatch(const char* name, uint8_t inputs, uint8_t outputs, Patch* pat
 
 SampleBuffer* samples;
 void setup(ProgramVector* pv){
+  icsi_init();
 #ifdef DEBUG_MEM
 #ifdef ARM_CORTEX
   size_t before = xPortGetFreeHeapSize();

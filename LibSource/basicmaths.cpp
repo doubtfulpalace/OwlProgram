@@ -1,8 +1,10 @@
 #include "basicmaths.h"
 #include <stdint.h>
-#include "FastLog.h"
 #include "FastPow.h"
 #include "device.h"
+#include "ServiceCall.h"
+#include "ProgramVector.h"
+#include "message.h"
 
 extern "C"{
 
@@ -40,6 +42,25 @@ float arm_sqrtf(float in){
   return out;
 }
 
+static FastPow fastPow;
+void icsi_init(){
+  float* icsi_exp_h;
+  float* icsi_exp_l;
+  float* icsi_log;
+  void* args[6] = {
+    (void*)SYSTEM_TABLE_ICSI_LOG, (void*)&icsi_exp_h, 
+    (void*)SYSTEM_TABLE_ICSI_E_L, (void*)&icsi_exp_l,
+    (void*)SYSTEM_TABLE_ICSI_E_L, (void*)&icsi_log
+  };
+  int ret = getProgramVector()->serviceCall(OWL_SERVICE_GET_ARRAY, args, 6);
+  debugMessage("icsi", (int)icsi_exp_h, (int)icsi_exp_l, (int)icsi_log);
+  if(ret == OWL_SERVICE_OK){
+    fastPow.setTables(icsi_exp_h, icsi_exp_l, icsi_log);
+  }else{
+    error(CONFIGURATION_ERROR_STATUS, "Failed to initialise ICSI exponentials");
+  }
+}
+
 // static char fastPowInitialized = 0;
 // static FastPow fastPow;
 // static void initializeFastPow(int fastPrecision){
@@ -54,51 +75,56 @@ float arm_sqrtf(float in){
 //   //  return u.d;
 
 // // New implementation, uses FastPow class
-// float fastpowf(float a, float b) {
+float fastpowf(float a, float b) {
 //   if(fastPowInitialized == 0){
 //     initializeFastPow(FASTPOW_PRECISION);
 //   }
-//   return fastPow.pow(a,b);
-// }
+  return fastPow.pow(a, b);
+}
 
-// float fastpow2f(float b){
+float fastexp2f(float b){
 //   if(fastPowInitialized == 0){
 //     initializeFastPow(FASTPOW_PRECISION);
 //   }
-//   return fastPow.powIlog(1, b);
+  return fastPow.powIlog(1, b);
+}
+
+// float fastexp10f(float b){
+//   #msg "todo"
+//   // return fastPow.powIlog(1, b);
 // }
 
-// float fastexpf(float b) {
+float fastexpf(float b) {
 //   if(fastPowInitialized == 0){
 //     initializeFastPow(FASTPOW_PRECISION);
 //   }
-//   static float eulerIlog = fastPow.computeIlog(exp(1));
-//   return fastPow.powIlog(eulerIlog, b);
-// }
+  static float eulerIlog = fastPow.computeIlog(exp(1));
+  return fastPow.powIlog(eulerIlog, b);
+}
 
-// float fastlog2f(float b){
+float fastlog2f(float b){
 //   if(fastPowInitialized == 0){
 //     initializeFastPow(FASTPOW_PRECISION); //note that here we would be initializing two tables, only to use the log.
 //   }
-//   static float ilog = 1/fastPow.log(2);
-//   return fastPow.log(b) * ilog;
-// }
+  static float ilog = 1/fastPow.log(2);
+  return fastPow.log(b) * ilog;
+}
 
-// float fastlog10f(float b){
+float fastlog10f(float b){
 //   // todo: test!
 //   if(fastPowInitialized == 0)
 //     initializeFastPow(FASTPOW_PRECISION);
-//   static float ilog = 1/fastPow.log(10);
-//   return fastPow.log(b) * ilog;
-// }
+  static float ilog = 1/fastPow.log(10);
+  return fastPow.log(b) * ilog;
+}
 
-// float fastlogf(float b){
+float fastlogf(float b){
 //   // todo: test!
 //   if(fastPowInitialized == 0)
 //     initializeFastPow(FASTPOW_PRECISION);
-//   static float ilog = 1/fastPow.log(M_E);
-//   return fastPow.log(b) * ilog;
-// }
+  static float ilog = 1/fastPow.log(M_E);
+  return fastPow.log(b) * ilog;
+}
 
 /* Fast arctan2
  * from http://dspguru.com/dsp/tricks/fixed-point-atan2-with-self-normalization

@@ -12,7 +12,7 @@ public:
       //CHECK_EQUAL(empty.getSize(), 0);
       //CHECK_CLOSE(tempc2[n].re, (cfa[n].re*tempc[n].re - cfa[n].im*tempc[n].im) >> 17, 4);
       float maxPerc = 0;
-      int NN = 10000;
+      int NN = 100000;
       for(int n = 1; n < NN ; n++){
         float in = n/(float(NN))*100;
         float approx = fastLog.log(in);
@@ -25,7 +25,7 @@ public:
           float fastlog2result = log2f(in);
           float fastlogresult1 = fastLog.log(in) / fastLog.log(2);
           float fastlogresult2 = fastLog.log(2, in);
-          float threshold = 0.000131;
+          float threshold = 0.000137; // tested with NN=10000000
 	  CHECK_CLOSE(fastlog2result, fastlogresult1, threshold);
 	  CHECK_CLOSE(fastlog2result, fastlogresult2, threshold);
         }

@@ -11,16 +11,16 @@ public:
       TEST("FastPow");
       printf("testing fastPow\n");
       FastPow fastPow;
-      FloatArray tableH_ = FloatArray::create(FastPow::tableHLength);
-      FloatArray tableL_ = FloatArray::create(FastPow::tableLLength);
-      FastPow::fillTableH(tableH_);
-      FastPow::fillTableL(tableL_);
+      // FloatArray tableH_ = FloatArray::create(FastPow::tableHLength);
+      // FloatArray tableL_ = FloatArray::create(FastPow::tableLLength);
+      // FastPow::fillTableH(tableH_);
+      // FastPow::fillTableL(tableL_);
       FloatArray tableH = FloatArray((float*)fast_pow_h_table, fast_pow_h_table_size);
       FloatArray tableL = FloatArray((float*)fast_pow_l_table, fast_pow_l_table_size);
-      for(int n = 0; n < tableH_.getSize(); ++n){
-        CHECK_EQUAL(tableH[n], tableH_[n]);
-        CHECK_EQUAL(tableL[n], tableL_[n]);
-      }
+      // for(int n = 0; n < tableH_.getSize(); ++n){
+      //   CHECK_EQUAL(tableH[n], tableH_[n]);
+      //   CHECK_EQUAL(tableL[n], tableL_[n]);
+      // }
       FloatArray logTable = FloatArray((float*)fast_log_table, 1 << fast_log_precision);
       fastPow.setTables(tableH, tableL, logTable);
       float maxPerc = 0;

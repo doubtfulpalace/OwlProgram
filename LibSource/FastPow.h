@@ -19,51 +19,51 @@ private:
   FastLog fastLog;
 
 public:
-  /**
-   * Initialize powFast lookup table.
-   */
-  static void fillTable(float* const pTable, const unsigned int precision,
-     const unsigned int extent, const bool isRound)
-  {
-    // step along table elements and x-axis positions
-    float zeroToOne = !isRound ?
-      0.0f : (1.0f / (static_cast<float>(1 << precision) * 2.0f));
-    for(int i = 0;  i < (1 << extent);  ++i )
-    {
-      // make y-axis value for table element
-      pTable[i] = ::powf( 2.0f, zeroToOne );
-      zeroToOne += 1.0f / static_cast<float>(1 << precision);
-    }
-  }
+  /* /\** */
+  /*  * Initialize powFast lookup table. */
+  /*  *\/ */
+  /* static void fillTable(float* const pTable, const unsigned int precision, */
+  /*    const unsigned int extent, const bool isRound) */
+  /* { */
+  /*   // step along table elements and x-axis positions */
+  /*   float zeroToOne = !isRound ? */
+  /*     0.0f : (1.0f / (static_cast<float>(1 << precision) * 2.0f)); */
+  /*   for(int i = 0;  i < (1 << extent);  ++i ) */
+  /*   { */
+  /*     // make y-axis value for table element */
+  /*     pTable[i] = ::powf( 2.0f, zeroToOne ); */
+  /*     zeroToOne += 1.0f / static_cast<float>(1 << precision); */
+  /*   } */
+  /* } */
   static constexpr int tableHExtent = 9;
   static constexpr int tableLExtent = 9;
   static constexpr int tableHLength = 1 << tableHExtent;
   static constexpr int tableLLength = 1 << tableLExtent;
-  FastPow() :
-    tableH_m(NULL),
-    tableL_m(NULL)
-  {}
+  /* FastPow() : */
+  /*   tableH_m(NULL), */
+  /*   tableL_m(NULL) */
+  /* {} */
 
   ~FastPow(){}
   
-  static int fillTableH(FloatArray table){
-    if(table.getSize() < 9)
-      return -1;
-    fillTable(table, 9, tableHExtent, false);
-    return 1;
-  }
+  /* static int fillTableH(FloatArray table){ */
+  /*   if(table.getSize() < 9) */
+  /*     return -1; */
+  /*   fillTable(table, 9, tableHExtent, false); */
+  /*   return 1; */
+  /* } */
 
-  static int fillTableL(FloatArray table){
-    if(table.getSize() < 9)
-      return -1;
-    fillTable(table, 18, tableLExtent, true);
-    return 1;
-  }
+  /* static int fillTableL(FloatArray table){ */
+  /*   if(table.getSize() < 9) */
+  /*     return -1; */
+  /*   fillTable(table, 18, tableLExtent, true); */
+  /*   return 1; */
+  /* } */
 
-  void setTables(float* tableH, float* tableL, FloatArray logTable){
+  void setTables(float* tableH, float* tableL, float* logTable){
     tableH_m = tableH;
     tableL_m = tableL;
-    fastLog.setTable(logTable);
+    fastLog.setTable(FloatArray(logTable, 16*1024));
   }
 
   /**

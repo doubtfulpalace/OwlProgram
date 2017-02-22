@@ -8,7 +8,7 @@
 // #define CHECK_EQUAL(a, b) if((a) != (b)){ fail("CHECK_EQUAL(" #a ", " #b ") fail", __LINE__); }else{ pass(); }
 // #define CHECK_CLOSE(a, b, c) if(abs((a)-(b))>(c)){ fail("CHECK_CLOSE(" #a ", " #b ", " #c ") fail", __LINE__); }else{ pass(); }
 #define CHECK_EQUAL(a, b) check_equal(a, b, __LINE__)
-#define CHECK_CLOSE(a, b, c) check_close(a, b, c, __LINE__)
+#define CHECK_CLOSE(a, b, c) check_close((float)a, (float)b, (float)c, __LINE__)
 #define REQUIRE(cond) if(!(cond)){ assert_failed("REQUIRE(" #cond ") fail", "", __LINE__); }else{ pass(); }
 
 /** Abstract base class for tests */
