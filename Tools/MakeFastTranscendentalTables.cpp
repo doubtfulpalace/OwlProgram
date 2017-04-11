@@ -83,6 +83,32 @@ int main(int argc, char** argv) {
         fprintf(file, "%a, ", arr[i]);
       fprintf(file, "\n};\n");
     }
+    FastPow fastPow(tableH, tableL, log_lookup_table, log_precision);
+    float err = 0;
+    float m = 0;
+    int numTest = 0;
+    float start = 0.01;
+    float stop = 100;
+	float startExp = -10;
+	float stopExp = 10;
+    float inc = 0.01;
+    for(float f = start; f < stop; f += inc)
+	{
+		for(float g = startExp; g < stopExp; g += inc)
+		{
+		  ++numTest;
+		  float acc = powf(f, g);
+		  float app = fastPow.pow(f, g);
+		  if(fabsf(acc) > 0.001)
+		  {
+			//printf("log: %.4f, std: %.4f, err: %.4f%%\n", app, acc, (app - acc) / acc * 100);
+			float e = fabsf((app - acc) / acc);
+			err += e;
+			m = e > m ? e : m;
+		  }
+		}
+	}
+    printf("pow: relative error over range powf([%f,%f], [%f, %f]): average %f%%, max: %f%%\n", start, stop, startExp, stopExp, err * 100 / numTest, m * 100);
   }
   return 0;
 }

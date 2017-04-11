@@ -39,10 +39,18 @@ public:
   static constexpr int tableLExtent = 9;
   static constexpr int tableHLength = 1 << tableHExtent;
   static constexpr int tableLLength = 1 << tableLExtent;
-  /* FastPow() : */
-  /*   tableH_m(NULL), */
-  /*   tableL_m(NULL) */
-  /* {} */
+
+  FastPow(float* tableH, float* tableL, float* logTable, unsigned int logPrecision) :
+    tableH_m(tableH),
+    tableL_m(tableL)
+  {
+    fastLog.setTable(logTable, logPrecision);
+  }
+    
+  FastPow() :
+    tableH_m(NULL),
+    tableL_m(NULL)
+  {}
 
   ~FastPow(){}
   
@@ -162,5 +170,4 @@ public:
     return log(base)*1.44269504088896;
   }
 };
-
 
