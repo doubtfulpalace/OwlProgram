@@ -32,7 +32,6 @@ SECTIONS
     . = ALIGN(8);
     _startprog = ABSOLUTE(.);         /* define a global symbol at program start */
     KEEP(*(.program_header)) /* Startup code */
-    . = ALIGN(8);
   } >PATCHRAM /* AT>PATCHFLASH */
 
   /* The program code and other data goes into FLASH */
@@ -64,27 +63,29 @@ SECTIONS
     KEEP (*(.fini))
     . = ALIGN(8);
     _etext = .;        /* define a global symbol at end of code */
-    . = ALIGN(8);
     _text_end = .;
-    . = ALIGN(8);
   } >PATCHRAM /* AT>PATCHFLASH */
 
   _text_load = LOADADDR (.text);
   .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >PATCHRAM /* AT>PATCHFLASH */
   .ARM : {
+    . = ALIGN(8);
     __exidx_start = .;
     *(.ARM.exidx*)
+    . = ALIGN(8);
     __exidx_end = .;
   } >PATCHRAM /* AT>PATCHFLASH */
 
   .preinit_array     :
   {
+    . = ALIGN(8);
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
   } >PATCHRAM /* AT>PATCHFLASH */
   .init_array :
   {
+    . = ALIGN(8);
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
@@ -92,6 +93,7 @@ SECTIONS
   } >PATCHRAM /* AT>PATCHFLASH */
   .fini_array :
   {
+    . = ALIGN(8);
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(.fini_array*))
     KEEP (*(SORT(.fini_array.*)))
@@ -126,7 +128,6 @@ SECTIONS
     *(COMMON)
     . = ALIGN(8);
     _ebss = .;         /* define a global symbol at bss end */
-    . = ALIGN(8);
     __bss_end__ = _ebss;
   } >PATCHRAM
 
@@ -144,7 +145,6 @@ SECTIONS
   {
     . = ALIGN(8);
     PROVIDE ( _fastheap = . );
-    . = ALIGN(8);
   } >CCMHEAP
   _fasteheap = ORIGIN(CCMHEAP) + LENGTH(CCMHEAP);
 
@@ -154,7 +154,6 @@ SECTIONS
   {
     . = ALIGN(8);
     *(.ccmdata)
-    . = ALIGN(8);
   } >CCMRAM
 
   /* User_stack section, used to check that there is enough RAM left */
@@ -162,8 +161,8 @@ SECTIONS
   {
     . = ALIGN(8);
     PROVIDE ( _stack = . );
-    . = . + _Min_Stack_Size;
     . = ALIGN(8);
+    . = . + _Min_Stack_Size;
   } >CCMRAM
   /* _estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM); */
   _estack = 0x10010000; /* end of CCMRAM */
