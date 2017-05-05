@@ -64,7 +64,9 @@ SECTIONS
     KEEP (*(.fini))
     . = ALIGN(8);
     _etext = .;        /* define a global symbol at end of code */
+    . = ALIGN(8);
     _text_end = .;
+    . = ALIGN(8);
   } >PATCHRAM /* AT>PATCHFLASH */
 
   _text_load = LOADADDR (.text);
@@ -97,6 +99,7 @@ SECTIONS
   } >PATCHRAM /* AT>PATCHFLASH */
 
   /* used by the startup to initialize data */
+  . = ALIGN(8);
   _sidata = .;
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
@@ -111,9 +114,9 @@ SECTIONS
   } >PATCHRAM
 
   /* Uninitialized data section */
-  . = ALIGN(8);
   .bss :
   {
+    . = ALIGN(8);
     _endprog = ABSOLUTE(.);         /* define a global symbol at program end */
     /* This is used by the startup in order to initialize the .bss secion */
     _sbss = .;         /* define a global symbol at bss start */
@@ -123,6 +126,7 @@ SECTIONS
     *(COMMON)
     . = ALIGN(8);
     _ebss = .;         /* define a global symbol at bss end */
+    . = ALIGN(8);
     __bss_end__ = _ebss;
   } >PATCHRAM
 
@@ -161,7 +165,8 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >CCMRAM
-  _estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM); /* 0x10010000; */   /* end of CCMRAM */
+  /* _estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM); */
+  _estack = 0x10010000; /* end of CCMRAM */
 
   /* External SRAM, used for heap memory */
   .extdata (NOLOAD) :
