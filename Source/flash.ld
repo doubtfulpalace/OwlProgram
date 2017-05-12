@@ -32,6 +32,7 @@ SECTIONS
     . = ALIGN(8);
     _startprog = ABSOLUTE(.);         /* define a global symbol at program start */
     KEEP(*(.program_header)) /* Startup code */
+    . = ALIGN(8);
   } >PATCHRAM /* AT>PATCHFLASH */
 
   /* The program code and other data goes into FLASH */
@@ -69,23 +70,19 @@ SECTIONS
   _text_load = LOADADDR (.text);
   .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >PATCHRAM /* AT>PATCHFLASH */
   .ARM : {
-    . = ALIGN(8);
     __exidx_start = .;
     *(.ARM.exidx*)
-    . = ALIGN(8);
     __exidx_end = .;
   } >PATCHRAM /* AT>PATCHFLASH */
 
   .preinit_array     :
   {
-    . = ALIGN(8);
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
   } >PATCHRAM /* AT>PATCHFLASH */
   .init_array :
   {
-    . = ALIGN(8);
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
@@ -93,7 +90,6 @@ SECTIONS
   } >PATCHRAM /* AT>PATCHFLASH */
   .fini_array :
   {
-    . = ALIGN(8);
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(.fini_array*))
     KEEP (*(SORT(.fini_array.*)))
@@ -101,7 +97,6 @@ SECTIONS
   } >PATCHRAM /* AT>PATCHFLASH */
 
   /* used by the startup to initialize data */
-  . = ALIGN(8);
   _sidata = .;
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
@@ -116,9 +111,9 @@ SECTIONS
   } >PATCHRAM
 
   /* Uninitialized data section */
+  . = ALIGN(8);
   .bss :
   {
-    . = ALIGN(8);
     _endprog = ABSOLUTE(.);         /* define a global symbol at program end */
     /* This is used by the startup in order to initialize the .bss secion */
     _sbss = .;         /* define a global symbol at bss start */
@@ -145,6 +140,7 @@ SECTIONS
   {
     . = ALIGN(8);
     PROVIDE ( _fastheap = . );
+    . = ALIGN(8);
   } >CCMHEAP
   _fasteheap = ORIGIN(CCMHEAP) + LENGTH(CCMHEAP);
 
@@ -154,6 +150,7 @@ SECTIONS
   {
     . = ALIGN(8);
     *(.ccmdata)
+    . = ALIGN(8);
   } >CCMRAM
 
   /* User_stack section, used to check that there is enough RAM left */
@@ -161,11 +158,10 @@ SECTIONS
   {
     . = ALIGN(8);
     PROVIDE ( _stack = . );
-    . = ALIGN(8);
     . = . + _Min_Stack_Size;
+    . = ALIGN(8);
   } >CCMRAM
-  /* _estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM); */
-  _estack = 0x10010000; /* end of CCMRAM */
+  _estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM);
 
   /* External SRAM, used for heap memory */
   .extdata (NOLOAD) :
