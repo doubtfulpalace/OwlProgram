@@ -38,7 +38,7 @@ public:
       // *dest++ = (uint32_t)(tmp+0x800000);
       // tmp = (int32_t)(right[i] * 0x800000);
       // *dest++ = (uint32_t)(tmp+0x800000);
-      tmp = ((int32_t)(right[i] * 2147483648.0f));
+      tmp = ((int32_t)(left[i] * 2147483648.0f));
       *dest++ = tmp>>8;
       tmp = ((int32_t)(right[i] * 2147483648.0f));
       *dest++ = tmp>>8;
