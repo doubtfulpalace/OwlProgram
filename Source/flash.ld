@@ -20,7 +20,7 @@ MEMORY
   PATCHRAM (rwx)   : ORIGIN = 0x2000c000, LENGTH = 64K    /* total RAM is 112kb */
   NVRAM (rw)       : ORIGIN = 0x40024000, LENGTH = 4K
   /* EXTRAM (rw)       : ORIGIN = 0x68000000, LENGTH = 1M */
-  EXTRAM (rw)      : ORIGIN = 0xD0000000, LENGTH = 1M
+  EXTRAM (rw)      : ORIGIN = 0xD0000000, LENGTH = 8M
 }
 
 /* Define output sections */
