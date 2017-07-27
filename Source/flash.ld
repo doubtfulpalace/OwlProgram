@@ -172,7 +172,7 @@ SECTIONS
     PROVIDE ( _heap = . );
     . = . + _Min_Heap_Size;
   } >EXTRAM
-    _eheap = ORIGIN(EXTRAM) + LENGTH(EXTRAM); /* 0x68100000; */
+  _eheap = ORIGIN(EXTRAM) + LENGTH(EXTRAM);
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
