@@ -52,6 +52,7 @@
 #endif
 
    float arm_sqrtf(float in);
+   void arm_srand32(uint32_t s);
    uint32_t arm_rand32();
 
    void icsi_init();
@@ -65,6 +66,9 @@
    float fastlog10f(float x);
 
    float fastatan2f(float a, float b);
+
+   /** generate a random number between 0 and 1 */
+   float randf();
 
 #ifdef __cplusplus
 }
@@ -81,6 +85,9 @@
 #define sqrt(x) arm_sqrtf(x)
 #define sqrtf(x) arm_sqrtf(x)
 #define rand() arm_rand32()
+#define tanh(x) tanhf(x)
+#define sinh(x) sinhf(x)
+#define cosh(x) coshf(x)
 
 #ifdef __FAST_MATH__ /* set by gcc option -ffast-math */
 // fast approximate math functions
